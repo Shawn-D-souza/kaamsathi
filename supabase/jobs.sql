@@ -2,6 +2,7 @@
 create table public.jobs (
   id uuid not null default gen_random_uuid() primary key,
   created_at timestamp with time zone default now() not null,
+  updated_at timestamp with time zone default now() not null,
   owner_id uuid not null references public.profiles(id) on delete cascade,
   title text not null,
   description text not null,
