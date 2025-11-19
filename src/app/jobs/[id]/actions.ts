@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function placeBid(prevState: any, formData: FormData) {
   const supabase = await createClient();
@@ -16,7 +17,6 @@ export async function placeBid(prevState: any, formData: FormData) {
     return { error: "Please enter a valid amount" };
   }
 
-  // Check if already bid
   const { data: existingBid } = await supabase
     .from("bids")
     .select("id")
@@ -41,4 +41,36 @@ export async function placeBid(prevState: any, formData: FormData) {
   }
 
   redirect("/my-jobs");
+}
+
+export async function completeJob(jobId: string) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("owner_id")
+    .eq("id", jobId)
+    .single();
+
+  if (!job || job.owner_id !== user.id) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("jobs")
+    .update({ status: "completed" })
+    .eq("id", jobId);
+
+  if (error) {
+    console.error("Complete Job Error:", error);
+    return { error: "Failed to complete job" };
+  }
+
+  revalidatePath("/my-jobs");
+  revalidatePath("/messages");
+  revalidatePath(`/messages/${jobId}`);
+  revalidatePath(`/jobs/${jobId}`);
 }
