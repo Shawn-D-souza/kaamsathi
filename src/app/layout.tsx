@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KaamSathi",
+  title: "KaamSaathi",
   description: "Peer-to-peer job marketplace",
 };
 
@@ -28,7 +28,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-black`}
       >
-        {/* Main Content Wrapper with bottom padding for Nav */}
         <div className="min-h-screen pb-20">
           {children}
         </div>

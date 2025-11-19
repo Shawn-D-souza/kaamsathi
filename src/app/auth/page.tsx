@@ -36,7 +36,6 @@ export default function AuthPage() {
         router.refresh();
 
       } else if (view === "sign-up") {
-        // Validation
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match");
         }
@@ -77,7 +76,7 @@ export default function AuthPage() {
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900">
         
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-brand-blue">KaamSathi</h1>
+          <h1 className="text-3xl font-bold text-brand-blue">KaamSaathi</h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {view === "sign-in" && "Welcome back!"}
             {view === "sign-up" && "Create your account"}
@@ -86,7 +85,6 @@ export default function AuthPage() {
         </div>
 
         <form onSubmit={handleAuth} className="mt-8 space-y-6">
-          {/* Error Alert */}
           {error && (
             <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
               <AlertCircle size={16} />
@@ -94,7 +92,6 @@ export default function AuthPage() {
             </div>
           )}
           
-          {/* Success Message */}
           {message && (
             <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
               <CheckCircle size={16} />
@@ -150,7 +147,6 @@ export default function AuthPage() {
             )}
           </div>
 
-          {/* Forgot Password Link */}
           {view === "sign-in" && (
             <div className="text-right">
               <button
