@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { LogOut, User, Loader2 } from "lucide-react";
+import { LogOut, User, Loader2, Lock, Camera } from "lucide-react";
+import Link from "next/link";
 
 type Profile = {
   id: string;
@@ -57,7 +58,7 @@ export default function ProfilePage() {
     setUpdating(true);
 
     const newRole = profile.role === "seeker" ? "provider" : "seeker";
-
+    
     // Optimistic update
     setProfile({ ...profile, role: newRole });
 
@@ -78,7 +79,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-black">
         <Loader2 className="h-8 w-8 animate-spin text-brand-blue" />
       </div>
     );
@@ -91,21 +92,36 @@ export default function ProfilePage() {
       {/* Profile Card */}
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm dark:bg-zinc-900">
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20">
+          {/* Avatar - Clickable to Edit */}
+          <Link 
+            href="/profile/edit"
+            className="relative group flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue overflow-hidden dark:bg-brand-blue/20"
+          >
             {profile?.avatar_url ? (
               <img 
                 src={profile.avatar_url} 
                 alt="Avatar" 
-                className="h-full w-full rounded-full object-cover" 
+                className="h-full w-full object-cover" 
               />
             ) : (
               <User size={32} />
             )}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {profile?.full_name || "User"}
-            </h2>
+            
+            {/* Overlay on Hover/Tap */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                <Camera size={20} className="text-white drop-shadow-md" />
+            </div>
+          </Link>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
+                {profile?.full_name || "User"}
+                </h2>
+                <Link href="/profile/edit" className="text-xs text-brand-blue font-medium hover:underline">
+                    Edit
+                </Link>
+            </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {profile?.role === "seeker" ? "Looking for help" : "Offering services"}
             </p>
@@ -142,13 +158,18 @@ export default function ProfilePage() {
             Provider
           </span>
         </div>
-        <div className="bg-gray-50 p-3 text-xs text-gray-500 dark:bg-zinc-800 dark:text-gray-400">
-          Switching modes will change your home feed and features.
-        </div>
       </div>
 
-      {/* Actions - Now nicely spaced below content instead of forced to bottom */}
+      {/* Actions */}
       <div className="space-y-3">
+        <Link
+          href="/profile/update-password"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-white p-4 font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:bg-zinc-900 dark:text-gray-300 dark:hover:bg-zinc-800"
+        >
+          <Lock size={20} />
+          Change Password
+        </Link>
+        
         <button
           onClick={handleSignOut}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 p-4 font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/10 dark:text-red-400"
