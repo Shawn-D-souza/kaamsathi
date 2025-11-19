@@ -21,15 +21,25 @@ export async function acceptBid(jobId: string, bidId: string, providerId: string
     return { error: "Unauthorized" };
   }
 
-  // 2. Update Bid Status
-  const { error: bidError } = await supabase
+  // 2. Update the Chosen Bid -> "accepted"
+  const { error: acceptError } = await supabase
     .from("bids")
     .update({ status: "accepted" })
     .eq("id", bidId);
 
-  if (bidError) return { error: "Failed to update bid" };
+  if (acceptError) return { error: "Failed to update bid" };
 
-  // 3. Reject other bids (Optional logic, skipping for simplicity)
+  // 3. Update All Other Bids -> "rejected"
+  // We don't stop the process if this fails, but we log it.
+  const { error: rejectError } = await supabase
+    .from("bids")
+    .update({ status: "rejected" })
+    .eq("job_id", jobId)
+    .neq("id", bidId); // Important: Don't reject the one we just accepted!
+
+  if (rejectError) {
+    console.error("Error rejecting other bids:", rejectError);
+  }
 
   // 4. Update Job Status & Assign Provider
   const { error: jobError } = await supabase
@@ -42,6 +52,7 @@ export async function acceptBid(jobId: string, bidId: string, providerId: string
 
   if (jobError) return { error: "Failed to update job" };
 
+  // 5. Revalidate paths to refresh UI
   revalidatePath(`/jobs/${jobId}/bids`);
   revalidatePath("/my-jobs");
   revalidatePath("/messages");
