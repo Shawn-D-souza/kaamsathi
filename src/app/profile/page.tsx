@@ -85,8 +85,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 p-6 pb-24 dark:bg-black">
-      <h1 className="mb-8 text-3xl font-bold text-brand-blue">Profile</h1>
+    <div className="flex min-h-dvh flex-col bg-gray-50 p-6 pb-24 dark:bg-black">
+      <h1 className="mb-6 text-3xl font-bold text-brand-blue">Profile</h1>
 
       {/* Profile Card */}
       <div className="mb-6 rounded-xl bg-white p-6 shadow-sm dark:bg-zinc-900">
@@ -147,8 +147,8 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="mt-auto space-y-3">
+      {/* Actions - Now nicely spaced below content instead of forced to bottom */}
+      <div className="space-y-3">
         <button
           onClick={handleSignOut}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 p-4 font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/10 dark:text-red-400"
