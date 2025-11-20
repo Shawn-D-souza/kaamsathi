@@ -1,4 +1,4 @@
-import { IndianRupee, Clock, Tag, Briefcase } from "lucide-react";
+import { IndianRupee, Clock, Tag } from "lucide-react";
 import Link from "next/link";
 
 interface Job {
@@ -47,7 +47,6 @@ export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean 
           </div>
         </div>
         
-        {/* We will implement the details page in the next task */}
         <Link 
           href={`/jobs/${job.id}`}
           className="block w-full rounded-lg bg-gray-50 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700"
