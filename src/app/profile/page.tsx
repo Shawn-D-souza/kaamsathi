@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { LogOut, User, Loader2, Lock, Camera } from "lucide-react";
+import { LogOut, User, Loader2, Lock, Camera, MapPin, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 type Profile = {
@@ -159,6 +159,27 @@ export default function ProfilePage() {
           </span>
         </div>
       </div>
+
+      {/* Service Zones Link (Only if Provider) */}
+      {profile?.role === "provider" && (
+        <div className="mb-6">
+            <Link
+            href="/profile/locations"
+            className="flex w-full items-center justify-between rounded-xl bg-white p-4 shadow-sm hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            >
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-brand-orange dark:bg-orange-900/20 dark:text-orange-400">
+                    <MapPin size={20} />
+                </div>
+                <div className="text-left">
+                    <h3 className="font-medium text-gray-900 dark:text-white">My Service Zones</h3>
+                    <p className="text-xs text-gray-500">Where you want to work</p>
+                </div>
+            </div>
+            <ArrowLeft size={16} className="rotate-180 text-gray-400" />
+            </Link>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="space-y-3">
