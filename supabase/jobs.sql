@@ -11,6 +11,9 @@ create table public.jobs (
   category text not null,
   status text not null check (status in ('open', 'in_progress', 'completed')) default 'open',
   
+  -- Multi-Hire Feature
+  quantity integer not null default 1 check (quantity > 0),
+
   -- Location Features
   is_remote boolean not null default false,
   location geography(Point),
@@ -31,6 +34,18 @@ create policy "Open jobs are viewable by everyone"
 create policy "Users can view their own jobs"
   on public.jobs for select
   using ( auth.uid() = owner_id );
+
+-- SELECT: Hired providers can view their jobs (Multi-hire logic)
+create policy "Hired providers can view their jobs"
+  on public.jobs for select
+  using (
+    exists (
+      select 1 from public.bids 
+      where bids.job_id = jobs.id 
+      and bids.bidder_id = auth.uid() 
+      and bids.status = 'accepted'
+    )
+  );
 
 -- INSERT: Only users with 'seeker' role can insert jobs
 create policy "Seekers can insert jobs"
