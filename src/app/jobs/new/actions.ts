@@ -32,6 +32,13 @@ export async function createJob(prevState: any, formData: FormData) {
   const budget = parseFloat(formData.get("budget") as string);
   const deadline = formData.get("deadline") as string;
   const category = formData.get("category") as string;
+  
+  // New Geospatial Fields
+  const isRemoteStr = formData.get("is_remote") as string;
+  const isRemote = isRemoteStr === "true";
+  const latStr = formData.get("lat") as string;
+  const lngStr = formData.get("lng") as string;
+  const radiusStr = formData.get("radius") as string;
 
   if (!title || !description || !budget || !deadline || !category) {
     return { error: "All fields are required." };
@@ -45,6 +52,19 @@ export async function createJob(prevState: any, formData: FormData) {
     return { error: "Deadline cannot be in the past." };
   }
 
+  // Validate Location if NOT remote
+  let locationString = null;
+  let radius = null;
+
+  if (!isRemote) {
+    if (!latStr || !lngStr) {
+        return { error: "Please select a location on the map for this job." };
+    }
+    // PostGIS Format: POINT(longitude latitude)
+    locationString = `POINT(${parseFloat(lngStr)} ${parseFloat(latStr)})`;
+    radius = parseInt(radiusStr) || 1000;
+  }
+
   // 4. Insert into Database
   const { error } = await supabase.from("jobs").insert({
     owner_id: user.id,
@@ -54,6 +74,9 @@ export async function createJob(prevState: any, formData: FormData) {
     deadline,
     category,
     status: "open",
+    is_remote: isRemote,
+    location: locationString, // Will be null if remote
+    radius_meters: radius
   });
 
   if (error) {
