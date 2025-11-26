@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, MapPin } from "lucide-react";
 import JobCard from "@/components/JobCard";
 
 export default async function Home() {
@@ -19,7 +19,7 @@ export default async function Home() {
           <p className="text-gray-600 dark:text-gray-300 mb-8">
             The peer-to-peer marketplace for students.
             <br />
-            Find help or earn money.
+            Find help locally or remote.
           </p>
           
           <div className="space-y-3">
@@ -36,7 +36,6 @@ export default async function Home() {
   }
 
   // 2. Dashboard (Logged In)
-  // Fetch Profile to know Role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -45,10 +44,10 @@ export default async function Home() {
   
   const isSeeker = profile?.role === 'seeker';
 
-  // Fetch Jobs based on Role
-  let jobs = [];
+  let jobs: any[] = [];
+
   if (isSeeker) {
-    // Seekers see their own jobs
+    // Seekers: See their own posted jobs
     const { data } = await supabase
       .from("jobs")
       .select("*")
@@ -56,12 +55,14 @@ export default async function Home() {
       .order("created_at", { ascending: false });
     jobs = data || [];
   } else {
-    // Providers see all OPEN jobs
-    const { data } = await supabase
-      .from("jobs")
-      .select("*")
-      .eq("status", "open")
-      .order("created_at", { ascending: false });
+    // Providers: See "Relevant" jobs (Remote + Within Service Zones)
+    // We use the RPC function we created in the database
+    const { data, error } = await supabase
+      .rpc('get_relevant_jobs', { p_provider_id: user.id });
+    
+    if (error) {
+      console.error("Error fetching feed:", error);
+    }
     jobs = data || [];
   }
 
@@ -75,7 +76,7 @@ export default async function Home() {
               {isSeeker ? "My Jobs" : "Job Feed"}
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isSeeker ? "Manage your postings" : "Find work instantly"}
+              {isSeeker ? "Manage your postings" : "Jobs matching your zones"}
             </p>
           </div>
           
@@ -96,28 +97,36 @@ export default async function Home() {
         {jobs.length === 0 ? (
           <div className="mt-10 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800">
-              <Search className="text-gray-400" />
+              {isSeeker ? <Search className="text-gray-400" /> : <MapPin className="text-gray-400" />}
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {isSeeker ? "No jobs posted yet" : "No jobs available"}
+              {isSeeker ? "No jobs posted yet" : "No matching jobs found"}
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
               {isSeeker 
                 ? "Create your first job posting to get started." 
-                : "Check back later for new opportunities."}
+                : "Try adding more 'Service Zones' in your profile to see local jobs, or wait for remote work."}
             </p>
-            {isSeeker && (
+            
+            {isSeeker ? (
                <Link
                href="/jobs/new"
                className="mt-4 inline-block rounded-md bg-brand-orange px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
              >
                Post a Job
              </Link>
+            ) : (
+                <Link
+                href="/profile/locations"
+                className="mt-4 inline-block rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:text-gray-300"
+              >
+                Manage Zones
+              </Link>
             )}
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobs.map((job: any) => (
+            {jobs.map((job) => (
               <JobCard key={job.id} job={job} isOwner={isSeeker} />
             ))}
           </div>
