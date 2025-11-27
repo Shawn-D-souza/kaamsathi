@@ -33,6 +33,9 @@ export async function createJob(prevState: any, formData: FormData) {
   const deadline = formData.get("deadline") as string;
   const category = formData.get("category") as string;
   
+  // Multi-hire field
+  const quantity = parseInt(formData.get("quantity") as string) || 1;
+  
   // New Geospatial Fields
   const isRemoteStr = formData.get("is_remote") as string;
   const isRemote = isRemoteStr === "true";
@@ -46,6 +49,10 @@ export async function createJob(prevState: any, formData: FormData) {
 
   if (budget <= 0) {
     return { error: "Budget must be greater than 0." };
+  }
+
+  if (quantity <= 0) {
+    return { error: "You must hire at least 1 person." };
   }
 
   if (new Date(deadline) < new Date()) {
@@ -73,6 +80,7 @@ export async function createJob(prevState: any, formData: FormData) {
     budget,
     deadline,
     category,
+    quantity, // Save the quantity
     status: "open",
     is_remote: isRemote,
     location: locationString, // Will be null if remote

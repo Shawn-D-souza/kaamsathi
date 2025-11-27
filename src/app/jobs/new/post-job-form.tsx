@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createJob } from "./actions";
-import { Loader2, ArrowLeft, MapPin, Globe, Laptop } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Laptop, Users, Calculator } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
@@ -28,9 +28,18 @@ export default function PostJobForm() {
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [radius, setRadius] = useState(1000); // Default 1km
 
+  // Budget & Quantity State (For Total Calculation)
+  const [budget, setBudget] = useState<string>("");
+  // FIX: Initialize as string "1" to allow backspacing to empty string ""
+  const [quantity, setQuantity] = useState<string>("1");
+
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
+  // Format strictly as YYYY-MM-DDTHH:mm for datetime-local input
+  const minDate = tomorrow.toISOString().slice(0, 16);
+
+  // FIX: Safely parse quantity string to integer for calculation
+  const totalCost = (parseFloat(budget) || 0) * (parseInt(quantity) || 0);
 
   return (
     <div className="flex min-h-dvh flex-col bg-gray-50 p-6 pb-24 dark:bg-black">
@@ -185,37 +194,77 @@ export default function PostJobForm() {
             />
           </div>
 
-          {/* Budget & Deadline Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Budget (₹)
-              </label>
-              <input
-                type="number"
-                name="budget"
-                id="budget"
-                required
-                min="1"
-                step="0.01"
-                placeholder="500"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-              />
+          {/* --- Multi-Hire Section --- */}
+          <div className="rounded-lg bg-gray-50 p-4 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800">
+            <div className="flex items-center gap-2 mb-4 text-brand-blue font-medium">
+                <Calculator size={18} />
+                <h3>Payment & Hiring</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+                {/* Budget Per Person */}
+                <div>
+                    <label htmlFor="budget" className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                        Budget (Per Person)
+                    </label>
+                    <div className="relative mt-1">
+                        <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                        <input
+                            type="number"
+                            name="budget"
+                            id="budget"
+                            required
+                            min="1"
+                            step="0.01"
+                            value={budget}
+                            onChange={(e) => setBudget(e.target.value)}
+                            placeholder="500"
+                            className="block w-full rounded-md border border-gray-300 pl-7 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
+                        />
+                    </div>
+                </div>
+
+                {/* Quantity */}
+                <div>
+                    <label htmlFor="quantity" className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1">
+                        Hires Needed <Users size={12} />
+                    </label>
+                    <input
+                        type="number"
+                        name="quantity"
+                        id="quantity"
+                        required
+                        min="1"
+                        max="10"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
+                    />
+                </div>
             </div>
 
-            <div>
-              <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Deadline
-              </label>
-              <input
-                type="datetime-local"
-                name="deadline"
-                id="deadline"
-                required
-                min={minDate}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-              />
-            </div>
+            {/* Total Estimation */}
+            {totalCost > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-zinc-700 flex justify-between items-center text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Total Estimated Cost:</span>
+                    <span className="font-bold text-brand-orange text-lg">₹{totalCost.toFixed(2)}</span>
+                </div>
+            )}
+          </div>
+
+          {/* Deadline */}
+          <div>
+            <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Deadline
+            </label>
+            <input
+              type="datetime-local"
+              name="deadline"
+              id="deadline"
+              required
+              min={minDate}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
+            />
           </div>
 
           {/* Submit Button */}
