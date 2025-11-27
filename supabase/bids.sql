@@ -14,8 +14,7 @@ create table public.bids (
 -- 2. Enable RLS
 alter table public.bids enable row level security;
 
--- 3. Helper Function for RLS (Breaks infinite recursion)
--- This function runs as admin (SECURITY DEFINER) to check job ownership without triggering Job RLS
+-- 3. Helper Function for RLS
 create or replace function public.is_job_owner(job_uuid uuid, user_uuid uuid)
 returns boolean
 language sql
@@ -31,18 +30,16 @@ $$;
 
 -- 4. Policies
 
--- SELECT: 
--- Seekers can see bids on their jobs (Uses helper function to avoid recursion)
+-- SELECT
 create policy "Seekers can view bids on their jobs"
   on public.bids for select
   using ( public.is_job_owner(job_id, auth.uid()) );
 
--- Providers can see their own bids
 create policy "Providers can view their own bids"
   on public.bids for select
   using ( bidder_id = auth.uid() );
 
--- INSERT: Only providers can place bids
+-- INSERT
 create policy "Providers can insert bids"
   on public.bids for insert
   with check (
@@ -53,6 +50,11 @@ create policy "Providers can insert bids"
       and profiles.role = 'provider'
     )
   );
+
+-- UPDATE
+create policy "Seekers can update bids on their jobs"
+  on public.bids for update
+  using ( public.is_job_owner(job_id, auth.uid()) );
 
 -- 5. Indexes
 create index bids_job_id_idx on public.bids (job_id);

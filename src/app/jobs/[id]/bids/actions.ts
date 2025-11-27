@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export async function acceptBid(jobId: string, bidId: string, providerId: string) {
@@ -10,10 +9,10 @@ export async function acceptBid(jobId: string, bidId: string, providerId: string
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  // 1. Verify Owner
+  // 1. Verify Owner & Get Job Details
   const { data: job } = await supabase
     .from("jobs")
-    .select("owner_id")
+    .select("owner_id, quantity, status")
     .eq("id", jobId)
     .single();
 
@@ -21,7 +20,26 @@ export async function acceptBid(jobId: string, bidId: string, providerId: string
     return { error: "Unauthorized" };
   }
 
-  // 2. Update the Chosen Bid -> "accepted"
+  if (job.status !== 'open') {
+    return { error: "This job is no longer open for hiring." };
+  }
+
+  // 2. Count CURRENT accepted bids
+  const { count: hiredCount, error: countError } = await supabase
+    .from("bids")
+    .select("*", { count: 'exact', head: true })
+    .eq("job_id", jobId)
+    .eq("status", "accepted");
+
+  if (countError) return { error: "Failed to verify hiring limit." };
+
+  const currentHires = hiredCount || 0;
+
+  if (currentHires >= job.quantity) {
+    return { error: "Hiring limit reached for this job." };
+  }
+
+  // 3. Update the Bid
   const { error: acceptError } = await supabase
     .from("bids")
     .update({ status: "accepted" })
@@ -29,33 +47,23 @@ export async function acceptBid(jobId: string, bidId: string, providerId: string
 
   if (acceptError) return { error: "Failed to update bid" };
 
-  // 3. Update All Other Bids -> "rejected"
-  // We don't stop the process if this fails, but we log it.
-  const { error: rejectError } = await supabase
-    .from("bids")
-    .update({ status: "rejected" })
-    .eq("job_id", jobId)
-    .neq("id", bidId); // Important: Don't reject the one we just accepted!
+  // 4. Check if Job is NOW Full
+  const newHireCount = currentHires + 1;
+  const isJobFull = newHireCount >= job.quantity;
 
-  if (rejectError) {
-    console.error("Error rejecting other bids:", rejectError);
-  }
+  if (isJobFull) {
+    // Close the job
+    await supabase.from("jobs").update({ status: "in_progress" }).eq("id", jobId);
+    
+    // Reject remaining pending bids
+    await supabase.from("bids").update({ status: "rejected" }).eq("job_id", jobId).eq("status", "pending");
+  } 
 
-  // 4. Update Job Status & Assign Provider
-  const { error: jobError } = await supabase
-    .from("jobs")
-    .update({ 
-      status: "in_progress",
-      assigned_provider_id: providerId
-    })
-    .eq("id", jobId);
-
-  if (jobError) return { error: "Failed to update job" };
-
-  // 5. Revalidate paths to refresh UI
+  // 5. Refresh UI (BUT DO NOT REDIRECT)
   revalidatePath(`/jobs/${jobId}/bids`);
   revalidatePath("/my-jobs");
   revalidatePath("/messages");
   
-  redirect(`/messages/${jobId}`);
+  // Return success status to the UI component
+  return { success: true, isFull: isJobFull };
 }

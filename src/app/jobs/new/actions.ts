@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function createJob(prevState: any, formData: FormData) {
   const supabase = await createClient();
@@ -80,10 +81,10 @@ export async function createJob(prevState: any, formData: FormData) {
     budget,
     deadline,
     category,
-    quantity, // Save the quantity
+    quantity, 
     status: "open",
     is_remote: isRemote,
-    location: locationString, // Will be null if remote
+    location: locationString, 
     radius_meters: radius
   });
 
@@ -92,6 +93,8 @@ export async function createJob(prevState: any, formData: FormData) {
     return { error: "Failed to post job. Please try again." };
   }
 
-  // 5. Redirect on Success
+  // 5. Clear Cache & Redirect
+  revalidatePath("/");        // Refresh Home Feed
+  revalidatePath("/my-jobs"); // Refresh My Jobs list
   redirect("/");
 }

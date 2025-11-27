@@ -12,6 +12,7 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
 
+  // 1. Fetch Job Info
   const { data: job } = await supabase
     .from("jobs")
     .select(`
@@ -19,31 +20,44 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
         title, 
         status,
         owner_id, 
-        assigned_provider_id,
-        owner:profiles!owner_id (full_name),
-        provider:profiles!assigned_provider_id (full_name)
+        owner:profiles!owner_id (full_name)
     `)
     .eq("id", jobId)
     .single();
 
   if (!job) notFound();
 
-  const isParticipant = job.owner_id === user.id || job.assigned_provider_id === user.id;
-  if (!isParticipant) redirect("/");
+  // 2. Fetch Participants (Owner + Accepted Bidders)
+  const { data: hiredBids } = await supabase
+    .from("bids")
+    .select("bidder_id")
+    .eq("job_id", jobId)
+    .eq("status", "accepted");
 
-  const unwrap = (data: any) => Array.isArray(data) ? data[0] : data;
+  const hiredIds = hiredBids?.map(b => b.bidder_id) || [];
+  const isOwner = job.owner_id === user.id;
+  const isHiredProvider = hiredIds.includes(user.id);
 
-  const otherName = job.owner_id === user.id 
-    ? unwrap(job.provider)?.full_name 
-    : unwrap(job.owner)?.full_name;
+  // 3. Access Control
+  if (!isOwner && !isHiredProvider) {
+    redirect("/");
+  }
 
+  // 4. Header Info
+  const chatTitle = job.title; 
+  const ownerName = (Array.isArray(job.owner) ? job.owner[0] : job.owner)?.full_name || "Job Owner";
+  
+  const subTitle = isOwner 
+    ? `${hiredIds.length} Person(s) Hired` 
+    : `Posted by ${ownerName}`;
+
+  // 5. Fetch Messages
   const { data: messages } = await supabase
     .from("messages")
     .select("*")
     .eq("job_id", jobId)
     .order("created_at", { ascending: true });
 
-  const isOwner = job.owner_id === user.id;
   const showComplete = isOwner && job.status === 'in_progress';
 
   return (
@@ -53,9 +67,11 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
           <ArrowLeft size={20} />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="text-base font-bold text-brand-blue truncate">{otherName || "User"}</h1>
+          <h1 className="text-base font-bold text-brand-blue truncate">{chatTitle}</h1>
           <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">{job.title}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+              {subTitle}
+            </p>
             {job.status === 'completed' && (
               <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                 Completed
