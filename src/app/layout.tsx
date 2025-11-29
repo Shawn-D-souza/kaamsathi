@@ -26,12 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-black`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 dark:bg-black dark:text-gray-100`}
       >
-        <div className="min-h-screen pb-20">
-          {children}
+        <div className="mx-auto min-h-screen w-full max-w-md bg-white shadow-2xl shadow-black/5 dark:bg-black dark:shadow-none sm:border-x sm:border-gray-100 dark:sm:border-zinc-800">
+          <main className="min-h-screen pb-24">
+            {children}
+          </main>
+          <BottomNav />
         </div>
-        <BottomNav />
       </body>
     </html>
   );
