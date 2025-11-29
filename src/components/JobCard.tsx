@@ -1,4 +1,4 @@
-import { IndianRupee, Clock, Tag, MapPin, Laptop } from "lucide-react";
+import { IndianRupee, Clock, Tag, MapPin, Laptop, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 interface Job {
@@ -13,64 +13,76 @@ interface Job {
 }
 
 export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean }) {
+  const isExpired = new Date(job.deadline) < new Date();
+
   return (
-    <div className="flex flex-col justify-between rounded-xl bg-white p-5 shadow-sm transition-all hover:shadow-md border border-transparent hover:border-brand-blue/10 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700">
+    <Link 
+      href={`/jobs/${job.id}`}
+      className="group relative flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:border-brand-blue/30 hover:shadow-md active:scale-[0.99] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+    >
       <div>
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-brand-blue dark:bg-blue-900/20 dark:text-blue-300">
-                <Tag size={12} />
-                <span className="capitalize">{job.category}</span>
+        {/* Header: Badges & Date */}
+        <div className="mb-3 flex items-start justify-between">
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-brand-blue dark:bg-blue-900/20 dark:text-blue-300">
+                <Tag size={10} />
+                {job.category}
             </span>
             
-            {/* Location Badge */}
             {job.is_remote ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 dark:bg-purple-900/20 dark:text-purple-300">
-                    <Laptop size={12} />
-                    <span>Remote</span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-purple-700 dark:bg-purple-900/20 dark:text-purple-300">
+                    <Laptop size={10} />
+                    Remote
                 </span>
             ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
-                    <MapPin size={12} />
-                    <span>In Person</span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
+                    <MapPin size={10} />
+                    In Person
                 </span>
             )}
           </div>
           
-          <span className="text-[10px] text-gray-400 dark:text-zinc-500">
-            {new Date(job.created_at).toLocaleDateString()}
-          </span>
+          {isOwner && (
+             <span className="text-[10px] font-medium text-brand-orange bg-orange-50 px-2 py-0.5 rounded-full dark:bg-orange-900/20">
+               Your Post
+             </span>
+          )}
         </div>
 
-        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
-          {job.title}
-        </h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-          {job.description}
-        </p>
+        {/* Content */}
+        <div className="mb-4">
+          <h3 className="mb-1 text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-brand-blue dark:text-gray-100 transition-colors">
+            {job.title}
+          </h3>
+          <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 dark:text-gray-400">
+            {job.description}
+          </p>
+        </div>
       </div>
 
-      <div className="mt-4 space-y-3 border-t border-gray-100 pt-4 dark:border-zinc-800">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-1 font-semibold text-gray-900 dark:text-white">
-            <IndianRupee size={16} className="text-gray-400" />
-            {job.budget}
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-            <Clock size={16} />
-            <span className="text-xs">
-              {new Date(job.deadline).toLocaleDateString()}
-            </span>
+      {/* Footer: Meta Info */}
+      <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-4 dark:border-zinc-800">
+        <div className="flex flex-col">
+          <span className="text-[10px] text-gray-400 uppercase font-medium">Budget</span>
+          <div className="flex items-center gap-0.5 text-base font-bold text-gray-900 dark:text-white">
+            <IndianRupee size={14} className="text-gray-400 mt-[1px]" />
+            {job.budget.toLocaleString()}
           </div>
         </div>
-        
-        <Link 
-          href={`/jobs/${job.id}`}
-          className="block w-full rounded-lg bg-gray-50 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700"
-        >
-          {isOwner ? "Manage Job" : "View Details"}
-        </Link>
+
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] text-gray-400 uppercase font-medium">Deadline</span>
+          <div className={`flex items-center gap-1.5 text-sm font-medium ${isExpired ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}`}>
+            <Clock size={14} />
+            <span>{new Date(job.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+          </div>
+        </div>
       </div>
-    </div>
+      
+      {/* Decorative Arrow for Hover */}
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0">
+        <ChevronRight className="text-brand-blue/20" size={24} />
+      </div>
+    </Link>
   );
 }
