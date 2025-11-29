@@ -1,16 +1,16 @@
 # **KaamSaathi**
 
-A peer-to-peer service marketplace where students can post jobs and find help, or bid on jobs to offer their services.
+A peer-to-peer service marketplace where users can post jobs and find help, or bid on jobs to offer their services.
 
 **Live Demo:** [https://kaamsaathi.netlify.app/](https://kaamsaathi.netlify.app/)
 
 ## **Core Concept**
 
-KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.com but tailored for students. The core of the app is a **dual-role system** where every user can be both a "Seeker" and a "Provider," toggled instantly from their profile.
+KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.com but simplified for quick local or remote tasks. The core of the app is a **dual-role system** where every user can be both a "Seeker" and a "Provider," toggled instantly from their profile.
 
-* **"Seekers"** post a job or task they need done (e.g., "Need assignment help").  
-* **"Providers"** browse available jobs and place bids.  
-* The **Seeker** reviews the bids and accepts one, creating a private realtime chat to start the job.  
+* **"Seekers"** post a job or task they need done (e.g., "Need help moving furniture" or "Fix my script").  
+* **"Providers"** browse available jobs—filtered by their service zones—and place bids.  
+* The **Seeker** reviews bids and accepts one (or more), creating a private realtime chat to start the job.  
 * Once the work is done, the Seeker can **Mark as Complete**.
 
 ## **🚀 Tech Stack**
@@ -18,6 +18,7 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
 * **Framework:** [Next.js 15+](https://nextjs.org/) (App Router, Server Actions, TypeScript)  
 * **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)  
 * **Backend & Auth:** [Supabase](https://supabase.com/) (Postgres, Auth, Realtime, Storage)  
+* **Maps & Location:** [Leaflet](https://leafletjs.com/) (React Leaflet) \+ [PostGIS](https://postgis.net/) (Geospatial queries)  
 * **Icons:** [Lucide React](https://lucide.dev/)  
 * **Deployment:** [Netlify](https://www.netlify.com/) / [Vercel](https://vercel.com/)
 
@@ -40,19 +41,23 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
 ### **Marketplace (Seeker)**
 
 * **Post a Job:** Create listings with title, description, budget, and deadline.  
-* **Manage Bids:** View all incoming bids for your jobs.  
-* **Acceptance Logic:** Accepting a bid automatically rejects competing bids.  
+* **Interactive Maps:** Pinpoint the exact job location on a map and set a **Visibility Radius** (e.g., 5km) to control who sees the job.  
+* **Multi-Hire:** Specify the number of people needed (e.g., "Need 3 people for moving"). You can accept multiple bids for a single job until all spots are filled.  
+* **Manage Bids:** View all incoming bids, check provider profiles, and accept the best offers.  
 * **Job Completion:** Mark jobs as "Done" to close the loop.
 
 ### **Marketplace (Provider)**
 
-* **Job Feed:** Browse open jobs posted by other students.  
+* **Smart Job Feed:** Jobs are filtered automatically based on:  
+  1. **Remote Jobs:** Visible to everyone globally.  
+  2. **Local Jobs:** Only visible if they overlap with your defined "Service Zones."  
+* **Service Zones:** Providers can define multiple circular zones on the map (center \+ radius) where they are willing to work.  
 * **Bidding:** Place competitive bids on jobs you want to do.  
 * **My Bids:** Track the status of your sent bids (Pending/Accepted/Rejected).
 
 ### **Communication**
 
-* **Realtime Chat:** Instant 1-on-1 messaging between Seeker and Provider upon job acceptance.  
+* **Realtime Chat:** Instant 1-on-1 messaging between Seeker and Provider(s) upon job acceptance.  
 * **Status Updates:** Live updates when jobs are completed or bids are accepted.
 
 ## **🏃‍♂️ Getting Started Locally**
@@ -71,7 +76,9 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
    2. jobs.sql (Jobs table & Policies)  
    3. bids.sql (Bids table & Policies)  
    4. messages.sql (Chat system)  
-   5. storage.sql (Storage policies)  
+   5. locations.sql (Provider Zones & PostGIS setup)  
+   6. rpc.sql (Geospatial filtering function)  
+   7. storage.sql (Storage policies)  
 3. **Storage:**  
    * Go to **Storage** and create a new public bucket named avatars.  
    * Set file size limit to 2MB and allowed MIME types to image/\*.  
@@ -80,10 +87,11 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
 ### **3\. Install & Run**
 
 1. Clone the repository:  
-   git clone [https://github.com/Shawn-D-souza/kaamsathi.git](https://github.com/Shawn-D-souza/kaamsathi.git) 
+   git clone \[https://github.com/Shawn-D-souza/kaamsathi.git\](https://github.com/Shawn-D-souza/kaamsathi.git)  
    cd kaamsathi
 
 2. Install dependencies:  
+   \# Install dependencies  
    npm install
 
 3. Create your environment file:  
@@ -92,5 +100,4 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
    NEXT\_PUBLIC\_SUPABASE\_ANON\_KEY=your\_supabase\_anon\_key
 
 4. Run the development server:  
-   npm run dev
-
+   npm run dev  
