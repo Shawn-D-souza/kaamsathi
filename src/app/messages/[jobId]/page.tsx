@@ -28,7 +28,6 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
   if (!job) notFound();
 
   // 2. Fetch Participants (Owner + Accepted Bidders with Profiles)
-  // UPDATED: Now fetching profile data for the review modal
   const { data: hiredBids } = await supabase
     .from("bids")
     .select(`
@@ -38,6 +37,7 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
     .eq("job_id", jobId)
     .eq("status", "accepted");
 
+  // Flatten the response structure
   const hiredProviders = hiredBids?.map((b: any) => b.profiles) || [];
   const hiredIds = hiredProviders.map((p: any) => p.id);
   
@@ -50,8 +50,9 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
   }
 
   // 4. Header Info
-  const chatTitle = job.title; 
-  const ownerName = (Array.isArray(job.owner) ? job.owner[0] : job.owner)?.full_name || "Job Owner";
+  const chatTitle = job.title; // Fixed: Added this line back
+  const ownerData = Array.isArray(job.owner) ? job.owner[0] : job.owner;
+  const ownerName = ownerData?.full_name || "Job Owner";
   
   const subTitle = isOwner 
     ? `${hiredIds.length} Person(s) Hired` 
@@ -86,7 +87,6 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
           </div>
         </div>
         
-        {/* UPDATED: Passing the providers list to the button */}
         {showComplete && (
           <CompleteJobButton 
             jobId={jobId} 
