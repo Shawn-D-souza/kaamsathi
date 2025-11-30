@@ -27,14 +27,20 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
 
   if (!job) notFound();
 
-  // 2. Fetch Participants (Owner + Accepted Bidders)
+  // 2. Fetch Participants (Owner + Accepted Bidders with Profiles)
+  // UPDATED: Now fetching profile data for the review modal
   const { data: hiredBids } = await supabase
     .from("bids")
-    .select("bidder_id")
+    .select(`
+      bidder_id,
+      profiles:bidder_id (id, full_name, avatar_url)
+    `)
     .eq("job_id", jobId)
     .eq("status", "accepted");
 
-  const hiredIds = hiredBids?.map(b => b.bidder_id) || [];
+  const hiredProviders = hiredBids?.map((b: any) => b.profiles) || [];
+  const hiredIds = hiredProviders.map((p: any) => p.id);
+  
   const isOwner = job.owner_id === user.id;
   const isHiredProvider = hiredIds.includes(user.id);
 
@@ -80,7 +86,13 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
           </div>
         </div>
         
-        {showComplete && <CompleteJobButton jobId={jobId} />}
+        {/* UPDATED: Passing the providers list to the button */}
+        {showComplete && (
+          <CompleteJobButton 
+            jobId={jobId} 
+            providers={hiredProviders}
+          />
+        )}
       </header>
 
       <div className="flex-1 overflow-hidden">
