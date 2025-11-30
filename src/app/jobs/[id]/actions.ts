@@ -12,11 +12,17 @@ export async function placeBid(prevState: any, formData: FormData) {
 
   const jobId = formData.get("job_id") as string;
   const amount = parseFloat(formData.get("amount") as string);
+  const proposalRaw = formData.get("proposal") as string;
+  
+  // Clean up proposal: store as null if empty string
+  const proposalText = proposalRaw?.trim() || null;
 
+  // Validate Amount (Strict)
   if (!amount || amount <= 0) {
-    return { error: "Please enter a valid amount" };
+    return { error: "Please enter a valid amount." };
   }
 
+  // Check for existing bid
   const { data: existingBid } = await supabase
     .from("bids")
     .select("id")
@@ -28,16 +34,18 @@ export async function placeBid(prevState: any, formData: FormData) {
     return { error: "You have already placed a bid on this job." };
   }
 
+  // Insert Bid
   const { error } = await supabase.from("bids").insert({
     job_id: jobId,
     bidder_id: user.id,
     amount: amount,
+    proposal_text: proposalText, // Can be null now
     status: "pending",
   });
 
   if (error) {
     console.error("Bid Error:", error);
-    return { error: "Failed to place bid." };
+    return { error: "Failed to place bid. Please try again." };
   }
 
   redirect("/my-jobs");

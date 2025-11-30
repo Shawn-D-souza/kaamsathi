@@ -122,8 +122,8 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="bg-gray-50 p-6 dark:bg-zinc-800/50">
+        {/* Actions - UPDATED: Continuous background (white/zinc-900) with top border */}
+        <div className="p-6 border-t border-gray-100 dark:border-zinc-800">
           {isOwner ? (
             <Link
               href={`/jobs/${id}/bids`}
