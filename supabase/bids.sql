@@ -5,6 +5,7 @@ create table public.bids (
   job_id uuid not null references public.jobs(id) on delete cascade,
   bidder_id uuid not null references public.profiles(id) on delete cascade,
   amount numeric not null check (amount > 0),
+  proposal_text text,
   status text not null check (status in ('pending', 'accepted', 'rejected')) default 'pending',
   
   -- Prevent multiple bids from same provider on same job
