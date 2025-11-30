@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { Plus, Search, MapPin } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 import JobCard from "@/components/JobCard";
 
 export default async function Home() {
@@ -8,10 +8,9 @@ export default async function Home() {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 1. Public Landing Page (Logged Out)
   if (!user) {
     return (
-      <main className="flex min-h-dvh flex-col items-center justify-center p-6 bg-gray-50 dark:bg-black">
+      <div className="flex min-h-dvh flex-col items-center justify-center p-6 bg-gray-50 dark:bg-black">
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-center">
           <h1 className="text-3xl font-bold text-brand-blue mb-4">
             KaamSaathi
@@ -25,17 +24,16 @@ export default async function Home() {
           <div className="space-y-3">
             <Link 
               href="/auth" 
-              className="block w-full rounded-lg bg-brand-orange px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+              className="btn-primary w-full"
             >
               Get Started
             </Link>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
-  // 2. Dashboard (Logged In)
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -47,7 +45,6 @@ export default async function Home() {
   let jobs: any[] = [];
 
   if (isSeeker) {
-    // Seekers: See their own posted jobs
     const { data } = await supabase
       .from("jobs")
       .select("*")
@@ -55,47 +52,26 @@ export default async function Home() {
       .order("created_at", { ascending: false });
     jobs = data || [];
   } else {
-    // Providers: See "Relevant" jobs (Remote + Within Service Zones)
-    // We use the RPC function we created in the database
     const { data, error } = await supabase
       .rpc('get_relevant_jobs', { p_provider_id: user.id });
     
-    if (error) {
-      console.error("Error fetching feed:", error);
-    }
+    if (error) console.error("Error fetching feed:", error);
     jobs = data || [];
   }
 
   return (
-    <main className="min-h-dvh bg-gray-50 pb-24 dark:bg-black">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white px-6 py-4 shadow-sm dark:bg-zinc-900 dark:border-b dark:border-zinc-800">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-brand-blue">
-              {isSeeker ? "My Jobs" : "Job Feed"}
-            </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isSeeker ? "Manage your postings" : "Jobs matching your zones"}
-            </p>
-          </div>
-          
-          {isSeeker && (
-            <Link
-              href="/jobs/new"
-              className="flex items-center gap-2 rounded-full bg-brand-blue px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              <Plus size={16} />
-              Post
-            </Link>
-          )}
-        </div>
-      </header>
+    <div className="min-h-dvh bg-gray-50 dark:bg-black">
+      {/* Main Content Container */}
+      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+        
+        {/* Header - Standardized to match My Jobs & Messages */}
+        <h1 className="mb-6 text-2xl font-bold text-brand-blue">
+          {isSeeker ? "My Postings" : "Job Feed"}
+        </h1>
 
-      {/* Feed */}
-      <div className="p-6">
+        {/* Feed Content */}
         {jobs.length === 0 ? (
-          <div className="mt-10 text-center">
+          <div className="mt-12 text-center rounded-2xl border-2 border-dashed border-gray-200 p-12 dark:border-zinc-800">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800">
               {isSeeker ? <Search className="text-gray-400" /> : <MapPin className="text-gray-400" />}
             </div>
@@ -105,33 +81,33 @@ export default async function Home() {
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
               {isSeeker 
                 ? "Create your first job posting to get started." 
-                : "Try adding more 'Service Zones' in your profile to see local jobs, or wait for remote work."}
+                : "Try adding more 'Service Zones' in your profile to see local jobs."}
             </p>
             
             {isSeeker ? (
                <Link
                href="/jobs/new"
-               className="mt-4 inline-block rounded-md bg-brand-orange px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+               className="btn-primary mt-6 inline-flex"
              >
                Post a Job
              </Link>
             ) : (
                 <Link
                 href="/profile/locations"
-                className="mt-4 inline-block rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:text-gray-300"
+                className="mt-4 inline-block rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:text-gray-300"
               >
                 Manage Zones
               </Link>
             )}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-4">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} isOwner={isSeeker} />
             ))}
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
