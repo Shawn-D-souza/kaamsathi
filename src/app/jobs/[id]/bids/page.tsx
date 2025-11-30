@@ -1,17 +1,17 @@
 import { createClient } from "@/utils/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, IndianRupee, User, MessageSquare, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, IndianRupee, User, MessageSquare, CheckCircle2, Star } from "lucide-react";
 import AcceptButton from "./accept-button";
 
 export default async function ViewBidsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+  const { id } = await params;
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
 
-  // 1. Fetch Job & Hired Count
+  // 1. Fetch Job Info
   const { data: job } = await supabase
     .from("jobs")
     .select("id, title, owner_id, status, quantity")
@@ -21,17 +21,27 @@ export default async function ViewBidsPage({ params }: { params: Promise<{ id: s
   if (!job) notFound();
   if (job.owner_id !== user.id) redirect("/");
 
-  // 2. Fetch Bids
+  // 2. Fetch Bids with Profiles & Ratings
   const { data: bids } = await supabase
     .from("bids")
     .select(`
-      id, amount, created_at, status, bidder_id,
-      profiles:bidder_id (full_name, avatar_url)
+      id, amount, created_at, status, bidder_id, proposal_text,
+      profiles:bidder_id (
+        full_name, 
+        avatar_url,
+        reviews:reviews_reviewee_id (rating) 
+      )
     `)
     .eq("job_id", id)
     .order("amount", { ascending: true });
 
-  // Calculate Stats
+  // Helper to calculate average rating
+  const getRating = (reviews: any[]) => {
+    if (!reviews || reviews.length === 0) return null;
+    const total = reviews.reduce((acc, curr) => acc + curr.rating, 0);
+    return (total / reviews.length).toFixed(1);
+  };
+
   const hiredCount = bids?.filter((b: any) => b.status === 'accepted').length || 0;
   const isFull = hiredCount >= job.quantity;
 
@@ -53,7 +63,7 @@ export default async function ViewBidsPage({ params }: { params: Promise<{ id: s
                 </div>
             </div>
             
-            {/* Chat Shortcut (Visible if at least 1 hired) */}
+            {/* Chat Shortcut */}
             {hiredCount > 0 && (
                 <Link
                     href={`/messages/${job.id}`}
@@ -99,6 +109,10 @@ export default async function ViewBidsPage({ params }: { params: Promise<{ id: s
              const bidderProfile = Array.isArray(bid.profiles) ? bid.profiles[0] : bid.profiles;
              const isAccepted = bid.status === 'accepted';
              const isRejected = bid.status === 'rejected';
+             
+             // Calculate Rating
+             const avgRating = getRating(bidderProfile?.reviews);
+             const reviewCount = bidderProfile?.reviews?.length || 0;
 
              return (
                 <div key={bid.id} className={`rounded-xl p-5 shadow-sm border transition-all ${
@@ -118,7 +132,18 @@ export default async function ViewBidsPage({ params }: { params: Promise<{ id: s
                         )}
                       </div>
                       <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{bidderProfile?.full_name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-gray-900 dark:text-white">{bidderProfile?.full_name}</p>
+                            
+                            {/* RATING BADGE */}
+                            {avgRating && (
+                                <div className="flex items-center gap-0.5 rounded bg-yellow-100 px-1.5 py-0.5 text-[10px] font-bold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500">
+                                    <Star size={10} className="fill-current" />
+                                    <span>{avgRating}</span>
+                                    <span className="text-yellow-600/70 dark:text-yellow-500/70 font-normal">({reviewCount})</span>
+                                </div>
+                            )}
+                          </div>
                           <p className="text-xs text-gray-500">{new Date(bid.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
@@ -127,6 +152,13 @@ export default async function ViewBidsPage({ params }: { params: Promise<{ id: s
                         {bid.amount}
                     </div>
                   </div>
+                  
+                  {/* Proposal Text */}
+                  {bid.proposal_text && (
+                    <div className="mb-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-600 dark:bg-zinc-800 dark:text-gray-300">
+                        &quot;{bid.proposal_text}&quot;
+                    </div>
+                  )}
                   
                   {/* Action Area */}
                   {isAccepted ? (
