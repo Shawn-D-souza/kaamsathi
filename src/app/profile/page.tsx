@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { LogOut, User, Loader2, Lock, Camera, MapPin, ChevronRight, Briefcase, Search, Moon, Sun, Monitor } from "lucide-react";
+import { LogOut, User, Loader2, Lock, Camera, MapPin, ChevronRight, Briefcase, Search, Moon, Sun, Monitor, Star, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 type Profile = {
@@ -16,6 +16,7 @@ type Profile = {
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [stats, setStats] = useState({ rating: "0.0", reviewCount: 0, jobsCompleted: 0 });
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -26,7 +27,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     setMounted(true);
-    const getProfile = async () => {
+    const getData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -34,21 +35,38 @@ export default function ProfilePage() {
         return;
       }
 
-      const { data, error } = await supabase
+      // 1. Fetch Profile
+      const { data: profileData } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single();
 
-      if (error) {
-        console.error("Error fetching profile:", error);
-      } else {
-        setProfile(data as Profile);
-      }
+      if (profileData) setProfile(profileData as Profile);
+
+      // 2. Fetch Stats (Parallel)
+      const [reviewsRes, jobsRes] = await Promise.all([
+        // Get average rating (as Provider)
+        supabase.from("reviews").select("rating").eq("reviewee_id", user.id),
+        // Get completed jobs (as Seeker)
+        supabase.from("jobs").select("id", { count: 'exact' }).eq("owner_id", user.id).eq("status", "completed")
+      ]);
+
+      const ratings = reviewsRes.data || [];
+      const avg = ratings.length > 0 
+        ? (ratings.reduce((a, b) => a + b.rating, 0) / ratings.length).toFixed(1) 
+        : "N/A";
+
+      setStats({
+        rating: avg,
+        reviewCount: ratings.length,
+        jobsCompleted: jobsRes.count || 0
+      });
+
       setLoading(false);
     };
 
-    getProfile();
+    getData();
   }, [router, supabase]);
 
   const handleSignOut = async () => {
@@ -60,8 +78,6 @@ export default function ProfilePage() {
   const toggleRole = async (newRole: "seeker" | "provider") => {
     if (!profile || profile.role === newRole) return;
     setUpdating(true);
-
-    // Optimistic update
     setProfile({ ...profile, role: newRole });
 
     const { error } = await supabase
@@ -70,11 +86,9 @@ export default function ProfilePage() {
       .eq("id", profile.id);
 
     if (error) {
-      console.error("Error updating role:", error);
-      setProfile({ ...profile, role: profile.role }); // Revert
+      setProfile({ ...profile, role: profile.role }); 
       alert("Failed to update role.");
     }
-
     setUpdating(false);
   };
 
@@ -115,10 +129,25 @@ export default function ProfilePage() {
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           {profile?.full_name || "User"}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {profile?.role === "seeker" ? "Looking for help" : "Offering services"}
-        </p>
-        <Link href="/profile/edit" className="mt-2 text-xs font-semibold text-brand-blue hover:underline">
+        
+        {/* STATS BADGE */}
+        <div className="mt-2 flex items-center gap-3">
+            {/* Seeker Stat */}
+            <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-zinc-800 dark:text-gray-300">
+                <CheckCircle size={12} />
+                <span>{stats.jobsCompleted} Jobs Given</span>
+            </div>
+            
+            {/* Provider Stat (Only show if they have reviews) */}
+            {stats.reviewCount > 0 && (
+                <div className="flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500">
+                    <Star size={12} className="fill-current" />
+                    <span>{stats.rating} ({stats.reviewCount})</span>
+                </div>
+            )}
+        </div>
+
+        <Link href="/profile/edit" className="mt-3 text-xs font-semibold text-brand-blue hover:underline">
           Edit Profile
         </Link>
       </div>
