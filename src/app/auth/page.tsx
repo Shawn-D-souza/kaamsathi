@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
 
 type AuthView = "sign-in" | "sign-up" | "forgot-password";
@@ -81,61 +81,77 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 dark:bg-black">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900">
+    // FIX: Switched to 'min-h-dvh' and added 'overflow-hidden' to prevent mobile scroll glitch
+    <div className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-gray-50/50 p-4 dark:bg-black selection:bg-brand-blue/20">
+        
+        {/* Decorative background blob */}
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent dark:from-blue-900/20"></div>
+
+      <div className="w-full max-w-md space-y-8 rounded-3xl bg-white p-8 shadow-xl ring-1 ring-gray-100 dark:bg-zinc-900 dark:ring-zinc-800 md:p-10">
         
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-brand-blue">KaamSaathi</h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {view === "sign-in" && "Welcome back!"}
-            {view === "sign-up" && "Create your account"}
-            {view === "forgot-password" && "Reset your password"}
+          <h1 className="text-3xl font-extrabold text-brand-blue tracking-tight">KaamSaathi</h1>
+          <p className="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            {view === "sign-in" && "Welcome back! Please sign in."}
+            {view === "sign-up" && "Create your account to get started."}
+            {view === "forgot-password" && "Reset your password."}
           </p>
         </div>
 
-        <form onSubmit={handleAuth} className="mt-8 space-y-6">
+        <form onSubmit={handleAuth} className="mt-8 space-y-5">
           {error && (
-            <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
-              <AlertCircle size={16} className="shrink-0" />
+            <div className="flex items-start gap-3 rounded-2xl bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
           
           {message && (
-            <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400 animate-in fade-in slide-in-from-top-2">
-              <CheckCircle size={16} className="shrink-0" />
+            <div className="flex items-start gap-3 rounded-2xl bg-green-50 p-4 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400 animate-in fade-in slide-in-from-top-2">
+              <CheckCircle size={18} className="shrink-0 mt-0.5" />
               <span>{message}</span>
             </div>
           )}
           
           <div className="space-y-4">
+            {/* Email Input */}
             <div>
               <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Mail size={18} />
+                </div>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="block w-full rounded-2xl border-0 bg-gray-50 py-3.5 pl-11 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-brand-blue transition-all"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
             </div>
 
             {view !== "forgot-password" && (
               <div>
                 <label htmlFor="password" className="sr-only">Password</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Lock size={18} />
+                    </div>
+                    <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="block w-full rounded-2xl border-0 bg-gray-50 py-3.5 pl-11 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-brand-blue transition-all"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
               </div>
             )}
 
@@ -143,20 +159,25 @@ export default function AuthPage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <Lock size={18} />
+                    </div>
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        className="block w-full rounded-2xl border-0 bg-gray-50 py-3.5 pl-11 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-brand-blue transition-all"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 {/* --- Legal Consent Checkbox --- */}
-                <div className="flex items-start gap-3 px-1">
+                <div className="flex items-start gap-3 px-1 pt-1">
                   <div className="flex h-5 items-center">
                     <input
                       id="terms"
@@ -165,16 +186,16 @@ export default function AuthPage() {
                       required
                       checked={agreedToTerms}
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-blue dark:border-gray-600 dark:bg-black"
+                      className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-blue dark:border-zinc-600 dark:bg-zinc-800"
                     />
                   </div>
-                  <div className="text-xs">
-                    <label htmlFor="terms" className="font-medium text-gray-700 dark:text-gray-300">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <label htmlFor="terms">
                       I agree to the{" "}
                       <Link 
                         href="/legal/terms" 
                         target="_blank" 
-                        className="text-brand-blue hover:underline"
+                        className="font-semibold text-brand-blue hover:underline"
                       >
                         Terms of Service
                       </Link>
@@ -182,7 +203,7 @@ export default function AuthPage() {
                       <Link 
                         href="/legal/privacy" 
                         target="_blank" 
-                        className="text-brand-blue hover:underline"
+                        className="font-semibold text-brand-blue hover:underline"
                       >
                         Privacy Policy
                       </Link>.
@@ -202,7 +223,7 @@ export default function AuthPage() {
                     setError(null);
                     setMessage(null);
                 }}
-                className="text-xs font-medium text-brand-blue hover:underline"
+                className="text-xs font-semibold text-brand-blue hover:text-blue-700 transition-colors"
               >
                 Forgot Password?
               </button>
@@ -212,13 +233,13 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full justify-center rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-70"
+            className="flex w-full items-center justify-center rounded-2xl bg-brand-orange px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/30 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
           >
             {loading ? (
-              <Loader2 className="animate-spin" />
+              <Loader2 className="animate-spin h-5 w-5" />
             ) : (
               view === "sign-in" ? "Sign In" : 
-              view === "sign-up" ? "Sign Up" : 
+              view === "sign-up" ? "Create Account" : 
               "Send Reset Link"
             )}
           </button>
@@ -232,16 +253,16 @@ export default function AuthPage() {
                setError(null);
                setMessage(null);
              }}
-             className="font-semibold text-brand-blue hover:underline"
+             className="font-bold text-gray-600 hover:text-brand-blue transition-colors dark:text-gray-400"
            >
-             Back to Sign In
+             ← Back to Sign In
            </button>
           ) : (
-            <>
-                <span className="text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col gap-2">
+                <span className="text-gray-500 dark:text-gray-400">
                     {view === "sign-in"
-                    ? "Don't have an account? "
-                    : "Already have an account? "}
+                    ? "New to KaamSaathi?"
+                    : "Already have an account?"}
                 </span>
                 <button
                     onClick={() => {
@@ -249,11 +270,11 @@ export default function AuthPage() {
                     setError(null);
                     setMessage(null);
                     }}
-                    className="font-semibold text-brand-blue hover:underline"
+                    className="font-bold text-brand-blue hover:text-blue-700 transition-colors"
                 >
-                    {view === "sign-in" ? "Sign up" : "Sign in"}
+                    {view === "sign-in" ? "Create an account" : "Sign in to your account"}
                 </button>
-            </>
+            </div>
           )}
         </div>
       </div>
