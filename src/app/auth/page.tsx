@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 type AuthView = "sign-in" | "sign-up" | "forgot-password";
 
@@ -11,6 +12,10 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  // Legal Consent State
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
   const [view, setView] = useState<AuthView>("sign-in");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,11 +41,15 @@ export default function AuthPage() {
         router.refresh();
 
       } else if (view === "sign-up") {
+        // Validation
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match");
         }
         if (password.length < 6) {
           throw new Error("Password must be at least 6 characters");
+        }
+        if (!agreedToTerms) {
+          throw new Error("You must agree to the Terms and Privacy Policy to continue.");
         }
 
         const { error } = await supabase.auth.signUp({
@@ -86,15 +95,15 @@ export default function AuthPage() {
 
         <form onSubmit={handleAuth} className="mt-8 space-y-6">
           {error && (
-            <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-              <AlertCircle size={16} />
+            <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle size={16} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
           
           {message && (
-            <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
-              <CheckCircle size={16} />
+            <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400 animate-in fade-in slide-in-from-top-2">
+              <CheckCircle size={16} className="shrink-0" />
               <span>{message}</span>
             </div>
           )}
@@ -107,7 +116,7 @@ export default function AuthPage() {
                 name="email"
                 type="email"
                 required
-                className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
+                className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -122,7 +131,7 @@ export default function AuthPage() {
                   name="password"
                   type="password"
                   required
-                  className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
+                  className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -131,18 +140,55 @@ export default function AuthPage() {
             )}
 
             {view === "sign-up" && (
-              <div>
-                <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    className="relative block w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-blue focus:outline-none focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+
+                {/* --- Legal Consent Checkbox --- */}
+                <div className="flex items-start gap-3 px-1">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="terms"
+                      name="terms"
+                      type="checkbox"
+                      required
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-brand-blue focus:ring-brand-blue dark:border-gray-600 dark:bg-black"
+                    />
+                  </div>
+                  <div className="text-xs">
+                    <label htmlFor="terms" className="font-medium text-gray-700 dark:text-gray-300">
+                      I agree to the{" "}
+                      <Link 
+                        href="/legal/terms" 
+                        target="_blank" 
+                        className="text-brand-blue hover:underline"
+                      >
+                        Terms of Service
+                      </Link>
+                      {" "}and{" "}
+                      <Link 
+                        href="/legal/privacy" 
+                        target="_blank" 
+                        className="text-brand-blue hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>.
+                    </label>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -166,7 +212,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full justify-center rounded-md bg-brand-orange px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-70"
+            className="flex w-full justify-center rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-70"
           >
             {loading ? (
               <Loader2 className="animate-spin" />
