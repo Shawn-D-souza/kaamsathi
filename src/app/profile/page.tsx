@@ -4,7 +4,24 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { LogOut, User, Loader2, Lock, Camera, MapPin, ChevronRight, Briefcase, Search, Moon, Sun, Monitor, Star, CheckCircle } from "lucide-react";
+import { 
+  LogOut, 
+  User, 
+  Loader2, 
+  Lock, 
+  Camera, 
+  MapPin, 
+  ChevronRight, 
+  Briefcase, 
+  Search, 
+  Moon, 
+  Sun, 
+  Monitor, 
+  Star, 
+  CheckCircle,
+  Shield,
+  FileText
+} from "lucide-react";
 import Link from "next/link";
 
 type Profile = {
@@ -262,6 +279,44 @@ export default function ProfilePage() {
           </div>
           <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
         </Link>
+
+        {/* --- NEW LEGAL SECTION --- */}
+        <div className="pt-2">
+          <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            Legal
+          </p>
+          <div className="space-y-2">
+            <Link
+              href="/legal/terms"
+              className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400">
+                  <FileText size={20} />
+                </div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  Terms of Service
+                </div>
+              </div>
+              <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
+            </Link>
+
+            <Link
+              href="/legal/privacy"
+              className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400">
+                  <Shield size={20} />
+                </div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  Privacy Policy
+                </div>
+              </div>
+              <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
+            </Link>
+          </div>
+        </div>
 
         <button
           onClick={handleSignOut}
