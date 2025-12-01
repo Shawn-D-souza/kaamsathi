@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { IndianRupee, Briefcase, FileText, ChevronRight, Layers, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { IndianRupee, Briefcase, FileText, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default async function MyJobsPage() {
   const supabase = await createClient();
@@ -112,12 +112,12 @@ export default async function MyJobsPage() {
                     <Link 
                       key={job.id} 
                       href={`/jobs/${job.id}/bids`}
-                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg sm:active:scale-100 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         
                         <div className="flex-1 space-y-2">
-                          <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-blue dark:text-gray-50">
+                          <h3 className="text-lg font-bold text-gray-900 transition-colors sm:group-hover:text-brand-blue dark:text-gray-50">
                             {job.title}
                           </h3>
                           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
@@ -134,14 +134,15 @@ export default async function MyJobsPage() {
                             <IndianRupee size={16} className="mt-[2px] text-gray-400" />
                             {job.budget}
                           </div>
-                          <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors group-hover:bg-brand-blue/10 group-hover:text-brand-blue dark:bg-zinc-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
+                          <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors sm:group-hover:bg-brand-blue/10 sm:group-hover:text-brand-blue dark:bg-zinc-800 dark:sm:group-hover:bg-blue-900/20 dark:sm:group-hover:text-blue-400">
                              <ChevronRight size={18} />
                           </div>
                         </div>
 
                       </div>
                       
-                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out group-hover:scale-y-100"></div>
+                      {/* Decorative Hover Indicator (Desktop Only) */}
+                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out sm:group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>
@@ -160,12 +161,12 @@ export default async function MyJobsPage() {
                     <Link 
                       key={bid.id} 
                       href={bid.jobs?.id ? `/jobs/${bid.jobs.id}` : '#'}
-                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg sm:active:scale-100 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         
                         <div className="flex-1 space-y-2">
-                          <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-blue dark:text-gray-50">
+                          <h3 className="text-lg font-bold text-gray-900 transition-colors sm:group-hover:text-brand-blue dark:text-gray-50">
                             {bid.jobs?.title || "Unknown Job"}
                           </h3>
                           <div className="flex flex-wrap items-center gap-3">
@@ -184,14 +185,15 @@ export default async function MyJobsPage() {
                                     {bid.amount}
                                 </div>
                            </div>
-                           <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors group-hover:bg-brand-blue/10 group-hover:text-brand-blue dark:bg-zinc-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
+                           <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors sm:group-hover:bg-brand-blue/10 sm:group-hover:text-brand-blue dark:bg-zinc-800 dark:sm:group-hover:bg-blue-900/20 dark:sm:group-hover:text-blue-400">
                              <ChevronRight size={18} />
                           </div>
                         </div>
 
                       </div>
                       
-                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out group-hover:scale-y-100"></div>
+                      {/* Decorative Hover Indicator (Desktop Only) */}
+                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out sm:group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>

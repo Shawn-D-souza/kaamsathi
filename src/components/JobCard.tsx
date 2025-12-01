@@ -24,8 +24,7 @@ export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean 
   return (
     <Link 
       href={`/jobs/${job.id}`}
-      // Added 'overflow-hidden' here to clip the blue hover line to the card's rounded corners
-      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg sm:active:scale-100 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         
@@ -60,7 +59,7 @@ export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean 
 
           {/* Title & Description */}
           <div>
-            <h3 className="line-clamp-1 text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-blue dark:text-gray-50">
+            <h3 className="line-clamp-1 text-lg font-bold text-gray-900 transition-colors sm:group-hover:text-brand-blue dark:text-gray-50">
               {job.title}
             </h3>
             <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
@@ -70,7 +69,6 @@ export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean 
         </div>
 
         {/* RIGHT: Meta Info (Budget/Deadline) */}
-        {/* Mobile: Horizontal Row. Desktop: Vertical Column aligned right */}
         <div className="mt-2 flex shrink-0 items-center justify-between border-t border-gray-100 pt-3 dark:border-zinc-800 sm:mt-0 sm:w-auto sm:flex-col sm:items-end sm:justify-center sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
           
           {/* Budget */}
@@ -94,8 +92,8 @@ export default function JobCard({ job, isOwner }: { job: Job; isOwner?: boolean 
         </div>
       </div>
       
-      {/* Decorative Hover Indicator (Left Border) */}
-      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out group-hover:scale-y-100"></div>
+      {/* Decorative Hover Indicator (Desktop Only) */}
+      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out sm:group-hover:scale-y-100"></div>
     </Link>
   );
 }
