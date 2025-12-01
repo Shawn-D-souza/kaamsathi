@@ -12,47 +12,29 @@ export default function Navbar() {
   const supabase = createClient();
 
   useEffect(() => {
-    let channel: any;
-
-    const setupListener = async () => {
+    // 1. Initial Fetch
+    const fetchRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // 1. Initial Fetch
-      const fetchRole = async () => {
+      if (user) {
         const { data } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
         setIsSeeker(data?.role === "seeker");
-      };
-      fetchRole();
+      }
+    };
+    fetchRole();
 
-      // 2. Realtime Listener (Updates instantly when you switch in Profile)
-      channel = supabase
-        .channel('navbar-role-listener')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles',
-            filter: `id=eq.${user.id}`,
-          },
-          (payload: any) => {
-            // Update state instantly based on the change
-            setIsSeeker(payload.new.role === "seeker");
-          }
-        )
-        .subscribe();
+    // 2. Custom Event Listener (For instant updates from Profile Page)
+    const handleRoleUpdate = (event: CustomEvent) => {
+      setIsSeeker(event.detail === "seeker");
     };
 
-    setupListener();
+    window.addEventListener("role-updated", handleRoleUpdate as EventListener);
 
-    // Cleanup subscription on unmount
     return () => {
-      if (channel) supabase.removeChannel(channel);
+      window.removeEventListener("role-updated", handleRoleUpdate as EventListener);
     };
   }, [supabase]);
 

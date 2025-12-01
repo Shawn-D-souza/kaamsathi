@@ -64,9 +64,7 @@ export default function ProfilePage() {
 
       // 2. Fetch Stats (Parallel)
       const [reviewsRes, jobsRes] = await Promise.all([
-        // Get average rating (as Provider)
         supabase.from("reviews").select("rating").eq("reviewee_id", user.id),
-        // Get completed jobs (as Seeker)
         supabase.from("jobs").select("id", { count: 'exact' }).eq("owner_id", user.id).eq("status", "completed")
       ]);
 
@@ -96,16 +94,26 @@ export default function ProfilePage() {
   const toggleRole = async (newRole: "seeker" | "provider") => {
     if (!profile || profile.role === newRole) return;
     setUpdating(true);
+    
+    // 1. Optimistic Update (Instant UI feedback)
     setProfile({ ...profile, role: newRole });
 
+    // 2. Notify Navbar immediately
+    window.dispatchEvent(new CustomEvent("role-updated", { detail: newRole }));
+
+    // 3. Database Update
     const { error } = await supabase
       .from("profiles")
       .update({ role: newRole })
       .eq("id", profile.id);
 
     if (error) {
+      // Revert if failed
       setProfile({ ...profile, role: profile.role }); 
+      window.dispatchEvent(new CustomEvent("role-updated", { detail: profile.role }));
       alert("Failed to update role.");
+    } else {
+        router.refresh(); // Refresh server components if any depend on role
     }
     setUpdating(false);
   };
@@ -126,7 +134,7 @@ export default function ProfilePage() {
 
         <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
           
-          {/* --- LEFT COLUMN: Identity & Stats --- */}
+          {/* --- LEFT COLUMN --- */}
           <div className="lg:col-span-1 space-y-6">
             
             {/* Identity Card */}
@@ -216,10 +224,10 @@ export default function ProfilePage() {
 
           </div>
 
-          {/* --- RIGHT COLUMN: Settings & Menus --- */}
+          {/* --- RIGHT COLUMN --- */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Account Settings Group */}
+            {/* Account Settings */}
             <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               <div className="px-5 py-4 border-b border-gray-50 dark:border-zinc-800">
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -302,7 +310,7 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Legal & Danger */}
+            {/* Legal & Sign Out */}
             <div className="space-y-4">
               <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <div className="divide-y divide-gray-50 dark:divide-zinc-800">
