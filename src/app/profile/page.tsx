@@ -20,7 +20,8 @@ import {
   Star, 
   CheckCircle,
   Shield,
-  FileText
+  FileText,
+  Settings
 } from "lucide-react";
 import Link from "next/link";
 
@@ -111,230 +112,238 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-black">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50/50 dark:bg-black">
         <Loader2 className="h-8 w-8 animate-spin text-brand-blue" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-gray-50 p-6 pb-24 dark:bg-black">
-      <h1 className="mb-8 text-3xl font-bold text-brand-blue">Profile</h1>
+    <div className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black">
+      <div className="mx-auto max-w-screen-xl px-6 py-8">
+        
+        <h1 className="mb-8 text-2xl font-bold text-brand-blue">Profile</h1>
 
-      {/* User Info Card */}
-      <div className="mb-8 flex flex-col items-center">
-        <Link 
-          href="/profile/edit"
-          className="group relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-sm transition-transform active:scale-95 dark:border-zinc-800"
-        >
-          {profile?.avatar_url ? (
-            <img 
-              src={profile.avatar_url} 
-              alt="Avatar" 
-              className="h-full w-full object-cover" 
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400 dark:bg-zinc-800">
-              <User size={40} />
-            </div>
-          )}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
-            <Camera size={24} className="text-white" />
-          </div>
-        </Link>
-        
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {profile?.full_name || "User"}
-        </h2>
-        
-        {/* STATS BADGE */}
-        <div className="mt-2 flex items-center gap-3">
-            {/* Seeker Stat */}
-            <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-zinc-800 dark:text-gray-300">
-                <CheckCircle size={12} />
-                <span>{stats.jobsCompleted} Jobs Given</span>
-            </div>
+        <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
+          
+          {/* --- LEFT COLUMN: Identity & Stats --- */}
+          <div className="lg:col-span-1 space-y-6">
             
-            {/* Provider Stat (Only show if they have reviews) */}
-            {stats.reviewCount > 0 && (
-                <div className="flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500">
-                    <Star size={12} className="fill-current" />
-                    <span>{stats.rating} ({stats.reviewCount})</span>
+            {/* Identity Card */}
+            <div className="flex flex-col items-center rounded-2xl border border-gray-100 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <Link 
+                href="/profile/edit"
+                className="group relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-gray-50 shadow-sm transition-transform active:scale-95 dark:border-zinc-800"
+              >
+                {profile?.avatar_url ? (
+                  <img 
+                    src={profile.avatar_url} 
+                    alt="Avatar" 
+                    className="h-full w-full object-cover" 
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 dark:bg-zinc-800">
+                    <User size={40} />
+                  </div>
+                )}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity sm:group-hover:opacity-100">
+                  <Camera size={24} className="text-white" />
                 </div>
+              </Link>
+              
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {profile?.full_name || "User"}
+              </h2>
+              
+              <Link href="/profile/edit" className="mt-2 text-xs font-semibold text-brand-blue hover:underline">
+                Edit Profile
+              </Link>
+
+              {/* Stats Row */}
+              <div className="mt-6 flex w-full justify-center gap-4 border-t border-gray-100 pt-6 dark:border-zinc-800">
+                  <div className="text-center">
+                      <span className="block text-lg font-bold text-gray-900 dark:text-white">{stats.jobsCompleted}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Jobs Given</span>
+                  </div>
+                  <div className="h-auto w-px bg-gray-200 dark:bg-zinc-700"></div>
+                  <div className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <span className="block text-lg font-bold text-gray-900 dark:text-white">{stats.reviewCount > 0 ? stats.rating : "-"}</span>
+                        {stats.reviewCount > 0 && <Star size={12} className="fill-brand-orange text-brand-orange" />}
+                      </div>
+                      <span className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Rating</span>
+                  </div>
+              </div>
+            </div>
+
+            {/* Role Switcher */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <h3 className="mb-3 ml-1 text-xs font-bold uppercase tracking-wider text-gray-400">
+                Current Mode
+              </h3>
+              <div className="relative flex rounded-xl bg-gray-100 p-1 dark:bg-zinc-800">
+                <button
+                  onClick={() => toggleRole("seeker")}
+                  disabled={updating}
+                  className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${
+                    profile?.role === "seeker"
+                      ? "bg-white text-gray-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                  }`}
+                >
+                  <Search size={16} />
+                  Seeker
+                </button>
+                <button
+                  onClick={() => toggleRole("provider")}
+                  disabled={updating}
+                  className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${
+                    profile?.role === "provider"
+                      ? "bg-white text-gray-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                  }`}
+                >
+                  <Briefcase size={16} />
+                  Provider
+                </button>
+              </div>
+              <p className="mt-3 text-center text-xs text-gray-400">
+                {profile?.role === "seeker" 
+                  ? "You are hiring people for jobs." 
+                  : "You are looking for work."}
+              </p>
+            </div>
+
+          </div>
+
+          {/* --- RIGHT COLUMN: Settings & Menus --- */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Account Settings Group */}
+            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="px-5 py-4 border-b border-gray-50 dark:border-zinc-800">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Settings size={16} className="text-gray-400" /> Account Settings
+                </h3>
+              </div>
+              
+              <div className="divide-y divide-gray-50 dark:divide-zinc-800">
+                {profile?.role === "provider" && (
+                  <Link
+                    href="/profile/locations"
+                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-zinc-800/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-brand-orange dark:bg-orange-900/20">
+                        <MapPin size={16} />
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Service Zones</span>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-300 dark:text-zinc-600" />
+                  </Link>
+                )}
+
+                <Link
+                  href="/profile/update-password"
+                  className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-zinc-800/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-brand-blue dark:bg-blue-900/20">
+                      <Lock size={16} />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Change Password</span>
+                  </div>
+                  <ChevronRight size={18} className="text-gray-300 dark:text-zinc-600" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Appearance */}
+            {mounted && (
+              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+                  Appearance
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setTheme("light")}
+                    className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all active:scale-95 ${
+                      theme === "light"
+                        ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
+                        : "border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-400 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    <Sun size={20} />
+                    <span className="text-xs font-medium">Light</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("dark")}
+                    className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all active:scale-95 ${
+                      theme === "dark"
+                        ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
+                        : "border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-400 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    <Moon size={20} />
+                    <span className="text-xs font-medium">Dark</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("system")}
+                    className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all active:scale-95 ${
+                      theme === "system"
+                        ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
+                        : "border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-zinc-800 dark:text-gray-400 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    <Monitor size={20} />
+                    <span className="text-xs font-medium">System</span>
+                  </button>
+                </div>
+              </div>
             )}
-        </div>
 
-        <Link href="/profile/edit" className="mt-3 text-xs font-semibold text-brand-blue hover:underline">
-          Edit Profile
-        </Link>
-      </div>
-
-      {/* Role Switcher */}
-      <div className="mb-6">
-        <h3 className="mb-3 ml-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-          Mode
-        </h3>
-        <div className="relative flex rounded-xl bg-gray-200 p-1 dark:bg-zinc-800">
-          <button
-            onClick={() => toggleRole("seeker")}
-            disabled={updating}
-            className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-              profile?.role === "seeker"
-                ? "bg-white text-gray-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
-            }`}
-          >
-            <Search size={16} />
-            Seeker
-          </button>
-          <button
-            onClick={() => toggleRole("provider")}
-            disabled={updating}
-            className={`relative z-10 flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-              profile?.role === "provider"
-                ? "bg-white text-gray-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
-            }`}
-          >
-            <Briefcase size={16} />
-            Provider
-          </button>
-        </div>
-      </div>
-
-      {/* Appearance / Theme Switcher */}
-      {mounted && (
-        <div className="mb-8">
-          <h3 className="mb-3 ml-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Appearance
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => setTheme("light")}
-              className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all ${
-                theme === "light"
-                  ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
-                  : "border-transparent bg-white text-gray-500 hover:bg-gray-50 dark:bg-zinc-900 dark:text-gray-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <Sun size={20} />
-              <span className="text-xs font-medium">Light</span>
-            </button>
-            <button
-              onClick={() => setTheme("dark")}
-              className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all ${
-                theme === "dark"
-                  ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
-                  : "border-transparent bg-white text-gray-500 hover:bg-gray-50 dark:bg-zinc-900 dark:text-gray-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <Moon size={20} />
-              <span className="text-xs font-medium">Dark</span>
-            </button>
-            <button
-              onClick={() => setTheme("system")}
-              className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all ${
-                theme === "system"
-                  ? "border-brand-blue bg-blue-50 text-brand-blue dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
-                  : "border-transparent bg-white text-gray-500 hover:bg-gray-50 dark:bg-zinc-900 dark:text-gray-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <Monitor size={20} />
-              <span className="text-xs font-medium">System</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Menu Actions */}
-      <div className="space-y-4">
-        {profile?.role === "provider" && (
-          <Link
-            href="/profile/locations"
-            className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-brand-orange dark:bg-orange-900/20">
-                <MapPin size={20} />
-              </div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                Service Zones
-              </div>
-            </div>
-            <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
-          </Link>
-        )}
-
-        <Link
-          href="/profile/update-password"
-          className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-brand-blue dark:bg-blue-900/20">
-              <Lock size={20} />
-            </div>
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
-              Change Password
-            </div>
-          </div>
-          <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
-        </Link>
-
-        {/* --- NEW LEGAL SECTION --- */}
-        <div className="pt-2">
-          <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Legal
-          </p>
-          <div className="space-y-2">
-            <Link
-              href="/legal/terms"
-              className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400">
-                  <FileText size={20} />
-                </div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Terms of Service
+            {/* Legal & Danger */}
+            <div className="space-y-4">
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="divide-y divide-gray-50 dark:divide-zinc-800">
+                  <Link
+                    href="/legal/terms"
+                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-zinc-800/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText size={18} className="text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Terms of Service</span>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-300 dark:text-zinc-600" />
+                  </Link>
+                  <Link
+                    href="/legal/privacy"
+                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-zinc-800/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield size={18} className="text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Privacy Policy</span>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-300 dark:text-zinc-600" />
+                  </Link>
                 </div>
               </div>
-              <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
-            </Link>
 
-            <Link
-              href="/legal/privacy"
-              className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400">
-                  <Shield size={20} />
-                </div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Privacy Policy
-                </div>
-              </div>
-              <ChevronRight size={20} className="text-gray-300 dark:text-zinc-600" />
-            </Link>
+              <button
+                onClick={handleSignOut}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4 text-sm font-bold text-red-600 shadow-sm border border-gray-100 transition-all hover:bg-red-50 active:scale-[0.99] dark:bg-zinc-900 dark:border-zinc-800 dark:text-red-400 dark:hover:bg-red-900/10"
+              >
+                <LogOut size={18} />
+                Sign Out
+              </button>
+            </div>
+
+            <div className="text-center">
+                <p className="text-[10px] text-gray-400 dark:text-zinc-600">KaamSaathi v1.0.0</p>
+            </div>
+
           </div>
         </div>
-
-        <button
-          onClick={handleSignOut}
-          className="flex w-full items-center justify-between rounded-xl bg-white p-4 shadow-sm active:scale-[0.99] transition-transform dark:bg-zinc-900"
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500 dark:bg-red-900/20">
-              <LogOut size={20} />
-            </div>
-            <div className="text-sm font-medium text-red-600 dark:text-red-400">
-              Sign Out
-            </div>
-          </div>
-        </button>
-      </div>
-      
-      <div className="mt-8 text-center">
-        <p className="text-[10px] text-gray-300 dark:text-zinc-700">KaamSaathi v1.0.0</p>
       </div>
     </div>
   );
