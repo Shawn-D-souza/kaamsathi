@@ -112,7 +112,7 @@ export default async function MyJobsPage() {
                     <Link 
                       key={job.id} 
                       href={`/jobs/${job.id}/bids`}
-                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg sm:active:scale-100 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         
@@ -140,9 +140,6 @@ export default async function MyJobsPage() {
                         </div>
 
                       </div>
-                      
-                      {/* Decorative Hover Indicator (Desktop Only) */}
-                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out sm:group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>
@@ -161,7 +158,7 @@ export default async function MyJobsPage() {
                     <Link 
                       key={bid.id} 
                       href={bid.jobs?.id ? `/jobs/${bid.jobs.id}` : '#'}
-                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg sm:active:scale-100 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 active:scale-[0.99] sm:hover:-translate-y-0.5 sm:hover:border-brand-blue/30 sm:hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         
@@ -191,9 +188,6 @@ export default async function MyJobsPage() {
                         </div>
 
                       </div>
-                      
-                      {/* Decorative Hover Indicator (Desktop Only) */}
-                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out sm:group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>
