@@ -2,15 +2,15 @@
 
 import { useActionState, useState } from "react";
 import { createJob } from "./actions";
-import { Loader2, ArrowLeft, MapPin, Laptop, Users, Calculator } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Laptop, Users, Calculator, Info, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-// Lazy load the map to avoid SSR issues
+// Lazy load the map
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { 
   ssr: false,
   loading: () => (
-    <div className="h-[300px] w-full rounded-xl bg-gray-100 dark:bg-zinc-800 animate-pulse flex items-center justify-center text-gray-400 text-sm">
+    <div className="h-[300px] w-full rounded-2xl bg-gray-50 dark:bg-zinc-800/50 animate-pulse flex items-center justify-center text-gray-400 text-sm">
       Loading Map...
     </div>
   )
@@ -26,263 +26,282 @@ export default function PostJobForm() {
   // Location State
   const [isRemote, setIsRemote] = useState(false);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
-  const [radius, setRadius] = useState(1000); // Default 1km
+  const [radius, setRadius] = useState(1000); 
 
-  // Budget & Quantity State (For Total Calculation)
+  // Budget & Quantity State
   const [budget, setBudget] = useState<string>("");
-  // FIX: Initialize as string "1" to allow backspacing to empty string ""
   const [quantity, setQuantity] = useState<string>("1");
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  // Format strictly as YYYY-MM-DDTHH:mm for datetime-local input
   const minDate = tomorrow.toISOString().slice(0, 16);
 
-  // FIX: Safely parse quantity string to integer for calculation
   const totalCost = (parseFloat(budget) || 0) * (parseInt(quantity) || 0);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-gray-50 p-6 pb-24 dark:bg-black">
-      {/* Header */}
-      <div className="mb-6 flex items-center gap-4">
-        <Link
-          href="/"
-          className="rounded-full bg-white p-2 shadow-sm transition-colors hover:bg-gray-100 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-        >
-          <ArrowLeft size={20} className="text-gray-600 dark:text-gray-400" />
-        </Link>
-        <h1 className="text-2xl font-bold text-brand-blue">Post a Job</h1>
-      </div>
-
-      {/* Form Card */}
-      <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <form action={action} className="space-y-6">
-          {state?.error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-              {state.error}
-            </div>
-          )}
-
-          {/* --- Job Type Toggle (Remote vs Local) --- */}
-          <div className="rounded-lg border border-gray-200 p-1 dark:border-zinc-800 flex">
-            <button
-                type="button"
-                onClick={() => setIsRemote(false)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
-                    !isRemote 
-                    ? "bg-brand-blue text-white shadow-sm" 
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400"
-                }`}
-            >
-                <MapPin size={16} />
-                In Person
-            </button>
-            <button
-                type="button"
-                onClick={() => setIsRemote(true)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
-                    isRemote 
-                    ? "bg-brand-blue text-white shadow-sm" 
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400"
-                }`}
-            >
-                <Laptop size={16} />
-                Remote
-            </button>
+    <div className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black">
+      {/* Fixed: Widened container to max-w-screen-2xl to remove side gaps */}
+      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+        
+        {/* Header */}
+        <div className="mb-8 flex items-center gap-4">
+          <Link
+            href="/"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm transition-colors hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+          >
+            <ArrowLeft size={20} className="text-gray-600 dark:text-gray-400" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-brand-blue">Post a Job</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Describe your task and find help.</p>
           </div>
+        </div>
 
-          <input type="hidden" name="is_remote" value={isRemote.toString()} />
+        {/* Main Form Card */}
+        <div className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-gray-100 dark:bg-zinc-900 dark:ring-zinc-800 md:p-8">
+          <form action={action} className="space-y-8">
+            
+            {state?.error && (
+              <div className="flex items-center gap-2 rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                <Info size={18} />
+                {state.error}
+              </div>
+            )}
 
-          {/* --- Location Picker (Only if NOT Remote) --- */}
-          {!isRemote && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Job Location
-                    </label>
-                    <LeafletMap 
-                        interactive={true}
-                        location={location}
-                        radius={radius}
-                        onLocationSelect={(lat, lng) => {
-                            if (lat !== null && lng !== null) {
-                                setLocation({ lat, lng });
-                            } else {
-                                setLocation(null);
-                            }
-                        }}
-                    />
+            {/* --- 1. Job Type Toggle --- */}
+            <div>
+                <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    Location Type
+                </label>
+                <div className="grid grid-cols-2 gap-1 rounded-2xl bg-gray-100 p-1.5 dark:bg-zinc-800">
+                    <button
+                        type="button"
+                        onClick={() => setIsRemote(false)}
+                        className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 ${
+                            !isRemote 
+                            ? "bg-white text-brand-blue shadow-sm dark:bg-zinc-700 dark:text-white" 
+                            : "text-gray-500 hover:text-gray-900 dark:text-gray-400"
+                        }`}
+                    >
+                        <MapPin size={18} />
+                        In Person
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setIsRemote(true)}
+                        className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 ${
+                            isRemote 
+                            ? "bg-white text-brand-blue shadow-sm dark:bg-zinc-700 dark:text-white" 
+                            : "text-gray-500 hover:text-gray-900 dark:text-gray-400"
+                        }`}
+                    >
+                        <Laptop size={18} />
+                        Remote
+                    </button>
+                </div>
+                <input type="hidden" name="is_remote" value={isRemote.toString()} />
+            </div>
+
+            {/* --- 2. Location Picker (Conditional) --- */}
+            {!isRemote && (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
+                    <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-zinc-700">
+                        <LeafletMap 
+                            interactive={true}
+                            location={location}
+                            radius={radius}
+                            onLocationSelect={(lat, lng) => {
+                                if (lat !== null && lng !== null) {
+                                    setLocation({ lat, lng });
+                                } else {
+                                    setLocation(null);
+                                }
+                            }}
+                        />
+                    </div>
                     <input type="hidden" name="lat" value={location?.lat || ""} />
                     <input type="hidden" name="lng" value={location?.lng || ""} />
-                </div>
 
-                {/* Radius Slider */}
-                <div>
-                    <div className="flex justify-between text-sm mb-2">
-                        <label className="font-medium text-gray-700 dark:text-gray-300">
-                            Visibility Radius
-                        </label>
-                        <span className="text-brand-blue font-semibold">
-                            {(radius / 1000).toFixed(1)} km
-                        </span>
+                    {/* Radius Slider */}
+                    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-800/50">
+                        <div className="flex justify-between text-sm mb-3">
+                            <span className="font-medium text-gray-700 dark:text-gray-300">Visibility Radius</span>
+                            <span className="font-bold text-brand-blue">{(radius / 1000).toFixed(1)} km</span>
+                        </div>
+                        <input 
+                            type="range"
+                            name="radius"
+                            min="500"
+                            max="10000"
+                            step="100"
+                            value={radius}
+                            onChange={(e) => setRadius(Number(e.target.value))}
+                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-brand-blue dark:bg-zinc-700"
+                        />
+                        <p className="mt-2 text-xs text-gray-500">
+                            Providers within this circle will see your job.
+                        </p>
                     </div>
-                    <input 
-                        type="range"
-                        name="radius"
-                        min="500"
-                        max="10000"
-                        step="100"
-                        value={radius}
-                        onChange={(e) => setRadius(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue dark:bg-zinc-800"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                        Job will be visible to providers within this circle.
-                    </p>
                 </div>
-            </div>
-          )}
+            )}
 
-          {/* Title */}
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Job Title
-            </label>
-            <input
-              type="text"
-              name="title"
-              id="title"
-              required
-              placeholder={isRemote ? "e.g. Fix my Python script" : "e.g. Need help moving sofa"}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Category
-            </label>
-            <select
-              name="category"
-              id="category"
-              required
-              defaultValue=""
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-            >
-              <option value="" disabled>Select a category</option>
-              <option value="assignment">Assignment Help</option>
-              <option value="tutoring">Tutoring</option>
-              <option value="delivery">Delivery/Errands</option>
-              <option value="tech">Tech Support</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Description
-            </label>
-            <textarea
-              name="description"
-              id="description"
-              rows={4}
-              required
-              placeholder="Describe exactly what you need..."
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-            />
-          </div>
-
-          {/* --- Multi-Hire Section --- */}
-          <div className="rounded-lg bg-gray-50 p-4 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800">
-            <div className="flex items-center gap-2 mb-4 text-brand-blue font-medium">
-                <Calculator size={18} />
-                <h3>Payment & Hiring</h3>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-                {/* Budget Per Person */}
+            {/* --- 3. Job Details --- */}
+            <div className="space-y-5">
                 <div>
-                    <label htmlFor="budget" className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Budget (Per Person)
+                    <label htmlFor="title" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
+                        Job Title
                     </label>
-                    <div className="relative mt-1">
-                        <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        required
+                        placeholder={isRemote ? "e.g. Debug my React App" : "e.g. Help moving furniture"}
+                        className="block w-full rounded-2xl border-0 bg-gray-50 px-4 py-4 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700 dark:focus:ring-brand-blue transition-all"
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <label htmlFor="category" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
+                            Category
+                        </label>
+                        <div className="relative">
+                            <select
+                                name="category"
+                                id="category"
+                                required
+                                defaultValue=""
+                                className="block w-full appearance-none rounded-2xl border-0 bg-gray-50 px-4 py-4 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700"
+                            >
+                                <option value="" disabled>Select Category</option>
+                                <option value="assignment">Assignment Help</option>
+                                <option value="tutoring">Tutoring</option>
+                                <option value="delivery">Delivery</option>
+                                <option value="tech">Tech Support</option>
+                                <option value="household">Household</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="deadline" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
+                            Deadline
+                        </label>
                         <input
-                            type="number"
-                            name="budget"
-                            id="budget"
+                            type="datetime-local"
+                            name="deadline"
+                            id="deadline"
                             required
-                            min="1"
-                            step="0.01"
-                            value={budget}
-                            onChange={(e) => setBudget(e.target.value)}
-                            placeholder="500"
-                            className="block w-full rounded-md border border-gray-300 pl-7 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
+                            min={minDate}
+                            className="block w-full rounded-2xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700"
                         />
                     </div>
                 </div>
 
-                {/* Quantity */}
                 <div>
-                    <label htmlFor="quantity" className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase flex items-center gap-1">
-                        Hires Needed <Users size={12} />
+                    <label htmlFor="description" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
+                        Description
                     </label>
-                    <input
-                        type="number"
-                        name="quantity"
-                        id="quantity"
+                    <textarea
+                        name="description"
+                        id="description"
+                        rows={5}
                         required
-                        min="1"
-                        max="10"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white"
+                        placeholder="Provide details about what needs to be done..."
+                        className="block w-full rounded-2xl border-0 bg-gray-50 px-4 py-4 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700"
                     />
                 </div>
             </div>
 
-            {/* Total Estimation */}
-            {totalCost > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-zinc-700 flex justify-between items-center text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Total Estimated Cost:</span>
-                    <span className="font-bold text-brand-orange text-lg">₹{totalCost.toFixed(2)}</span>
+            {/* --- 4. Budget & Hiring --- */}
+            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="bg-gray-50 px-5 py-3 border-b border-gray-100 dark:bg-zinc-800/50 dark:border-zinc-800">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Calculator size={16} className="text-brand-orange" /> 
+                        Payment & Hiring
+                    </h3>
                 </div>
-            )}
-          </div>
+                
+                <div className="p-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label htmlFor="budget" className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Budget Per Person
+                        </label>
+                        <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                <span className="text-gray-500 font-bold">₹</span>
+                            </div>
+                            <input
+                                type="number"
+                                name="budget"
+                                id="budget"
+                                required
+                                min="1"
+                                placeholder="500"
+                                value={budget}
+                                onChange={(e) => setBudget(e.target.value)}
+                                className="block w-full rounded-xl border-0 bg-gray-50 py-3.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800 dark:text-white dark:ring-zinc-700"
+                            />
+                        </div>
+                    </div>
 
-          {/* Deadline */}
-          <div>
-            <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Deadline
-            </label>
-            <input
-              type="datetime-local"
-              name="deadline"
-              id="deadline"
-              required
-              min={minDate}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue dark:border-gray-700 dark:bg-black dark:text-white sm:text-sm"
-            />
-          </div>
+                    <div>
+                        <label htmlFor="quantity" className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Num. of People
+                        </label>
+                        <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                <Users size={16} className="text-gray-400" />
+                            </div>
+                            <input
+                                type="number"
+                                name="quantity"
+                                id="quantity"
+                                required
+                                min="1"
+                                max="10"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                                className="block w-full rounded-xl border-0 bg-gray-50 py-3.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800 dark:text-white dark:ring-zinc-700"
+                            />
+                        </div>
+                    </div>
+                </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isPending}
-            className="flex w-full items-center justify-center rounded-md bg-brand-orange px-4 py-3 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:opacity-70"
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Posting...
-              </>
-            ) : (
-              "Post Job"
-            )}
-          </button>
-        </form>
+                {totalCost > 0 && (
+                    <div className="bg-blue-50/50 px-5 py-4 flex justify-between items-center dark:bg-blue-900/10">
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-200">Total Estimated Cost</span>
+                        <span className="text-xl font-bold text-brand-blue">₹{totalCost.toLocaleString()}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Submit */}
+            <button
+                type="submit"
+                disabled={isPending}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-orange px-6 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-orange-500/30 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+            >
+                {isPending ? (
+                    <>
+                        <Loader2 className="animate-spin h-5 w-5" />
+                        Posting...
+                    </>
+                ) : (
+                    <>
+                        <CheckCircle2 size={20} />
+                        Post Job
+                    </>
+                )}
+            </button>
+
+          </form>
+        </div>
       </div>
     </div>
   );
