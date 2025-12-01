@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { IndianRupee, Briefcase, FileText, ChevronRight, Layers } from "lucide-react";
+import { IndianRupee, Briefcase, FileText, ChevronRight, Layers, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default async function MyJobsPage() {
   const supabase = await createClient();
@@ -23,7 +23,7 @@ export default async function MyJobsPage() {
       .from("bids")
       .select(`
         *,
-        jobs (id, title, status, budget)
+        jobs (id, title, status, budget, deadline)
       `)
       .eq("bidder_id", user.id)
       .order("created_at", { ascending: false })
@@ -33,19 +33,55 @@ export default async function MyJobsPage() {
   const myBids = myBidsRes.data || [];
   const isEmpty = postedJobs.length === 0 && myBids.length === 0;
 
+  // Helper for Status Badges
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'open':
+        return <span className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-green-700 dark:bg-green-900/30 dark:text-green-400">Open</span>;
+      case 'in_progress':
+        return <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Active</span>;
+      case 'completed':
+        return <span className="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gray-600 dark:bg-zinc-800 dark:text-zinc-400">Done</span>;
+      default:
+        return null;
+    }
+  };
+
+  const getBidStatusBadge = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            <CheckCircle2 size={12} /> Accepted
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-red-600 dark:bg-red-900/30 dark:text-red-400">
+            <XCircle size={12} /> Rejected
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-50 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500">
+            <AlertCircle size={12} /> Pending
+          </span>
+        );
+    }
+  };
+
   return (
-    <main className="min-h-dvh bg-gray-50 p-4 pb-24 md:p-8 dark:bg-black">
-      <div className="mx-auto max-w-3xl">
-        <header className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue dark:bg-blue-900/20 dark:text-blue-400">
-            <Layers size={20} />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Activity</h1>
+    <main className="min-h-dvh bg-gray-50/50 dark:bg-black">
+      {/* Full Width Container */}
+      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+        
+        <header className="mb-8">
+          <h1 className="text-2xl font-bold text-brand-blue">My Activity</h1>
         </header>
 
         {isEmpty ? (
-          <div className="mt-20 flex flex-col items-center justify-center text-center">
-            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-900">
+          <div className="mt-12 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-zinc-800">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 dark:bg-zinc-900">
               <Briefcase className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No activity yet</h3>
@@ -53,58 +89,59 @@ export default async function MyJobsPage() {
               Post a job to find help, or browse the feed to find work.
             </p>
             <div className="mt-6 flex gap-3">
-              <Link href="/jobs/new" className="rounded-lg bg-brand-orange px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90">
+              <Link href="/jobs/new" className="rounded-xl bg-brand-orange px-6 py-3 text-sm font-bold text-white hover:opacity-90 active:scale-95 transition-all">
                 Post Job
               </Link>
-              <Link href="/" className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+              <Link href="/" className="rounded-xl bg-brand-blue px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 active:scale-95 transition-all">
                 Find Work
               </Link>
             </div>
           </div>
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-12">
             
             {/* SECTION 1: JOBS I POSTED */}
             {postedJobs.length > 0 && (
-              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <section>
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  <Briefcase size={14} />
+                  <Briefcase size={16} />
                   Jobs You Posted
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {postedJobs.map((job: any) => (
                     <Link 
                       key={job.id} 
                       href={`/jobs/${job.id}/bids`}
-                      className="group block rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-brand-blue/50 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate dark:text-white group-hover:text-brand-blue transition-colors">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        
+                        <div className="flex-1 space-y-2">
+                          <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-blue dark:text-gray-50">
                             {job.title}
                           </h3>
-                          <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 font-medium ${
-                              job.status === 'open' 
-                                ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                : job.status === 'completed'
-                                ? 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'
-                                : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                            }`}>
-                              {job.status === 'open' ? 'Open' : job.status === 'in_progress' ? 'In Progress' : 'Completed'}
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            {getStatusBadge(job.status)}
+                            <span className="flex items-center gap-1">
+                                <Clock size={14} />
+                                {new Date(job.created_at).toLocaleDateString()}
                             </span>
-                            <span>•</span>
-                            <span>{new Date(job.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1 pl-4">
-                          <div className="flex items-center text-sm font-bold text-gray-900 dark:text-white">
-                            <IndianRupee size={14} className="mt-[1px]" />
+
+                        <div className="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-zinc-800 sm:w-auto sm:border-0 sm:pt-0">
+                          <div className="flex items-center gap-1 text-lg font-bold text-gray-900 dark:text-white sm:mr-6">
+                            <IndianRupee size={16} className="mt-[2px] text-gray-400" />
                             {job.budget}
                           </div>
-                          <ChevronRight size={16} className="text-gray-300 dark:text-zinc-700 group-hover:text-brand-blue transition-colors" />
+                          <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors group-hover:bg-brand-blue/10 group-hover:text-brand-blue dark:bg-zinc-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
+                             <ChevronRight size={18} />
+                          </div>
                         </div>
+
                       </div>
+                      
+                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>
@@ -113,42 +150,48 @@ export default async function MyJobsPage() {
 
             {/* SECTION 2: BIDS I PLACED */}
             {myBids.length > 0 && (
-              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+              <section>
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  <FileText size={14} />
+                  <FileText size={16} />
                   Your Bids
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {myBids.map((bid: any) => (
                     <Link 
                       key={bid.id} 
                       href={bid.jobs?.id ? `/jobs/${bid.jobs.id}` : '#'}
-                      className="group block rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-brand-blue/50 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+                      className="group relative block w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate dark:text-white group-hover:text-brand-blue transition-colors">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        
+                        <div className="flex-1 space-y-2">
+                          <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-brand-blue dark:text-gray-50">
                             {bid.jobs?.title || "Unknown Job"}
                           </h3>
-                          <div className="mt-1.5 flex items-center gap-2 text-xs">
-                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 font-medium ${
-                              bid.status === 'accepted' 
-                                ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                : bid.status === 'rejected'
-                                ? 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                                : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-500'
-                            }`}>
-                              {bid.status === 'pending' ? 'Pending' : bid.status === 'accepted' ? 'Accepted' : 'Rejected'}
+                          <div className="flex flex-wrap items-center gap-3">
+                            {getBidStatusBadge(bid.status)}
+                            <span className="text-xs text-gray-400 dark:text-zinc-500">
+                                Placed on {new Date(bid.created_at).toLocaleDateString()}
                             </span>
-                            <span className="text-gray-400 dark:text-zinc-600">•</span>
-                            <span className="text-gray-500 dark:text-gray-400">Bid: ₹{bid.amount}</span>
                           </div>
                         </div>
-                        <div className="flex items-center text-sm font-medium text-gray-400 dark:text-zinc-500">
-                           {bid.jobs?.budget && <span className="text-xs mr-2">Budget: ₹{bid.jobs.budget}</span>}
-                           <ChevronRight size={16} />
+
+                        <div className="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-zinc-800 sm:w-auto sm:border-0 sm:pt-0">
+                           <div className="sm:text-right sm:mr-6">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">Your Bid</span>
+                                <div className="flex items-center gap-0.5 text-lg font-bold text-brand-blue">
+                                    <IndianRupee size={16} className="mt-[2px]" />
+                                    {bid.amount}
+                                </div>
+                           </div>
+                           <div className="rounded-full bg-gray-50 p-2 text-gray-400 transition-colors group-hover:bg-brand-blue/10 group-hover:text-brand-blue dark:bg-zinc-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
+                             <ChevronRight size={18} />
+                          </div>
                         </div>
+
                       </div>
+                      
+                      <div className="absolute inset-y-0 left-0 w-1 scale-y-0 bg-brand-blue transition-transform duration-300 ease-out group-hover:scale-y-100"></div>
                     </Link>
                   ))}
                 </div>
