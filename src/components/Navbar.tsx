@@ -27,7 +27,7 @@ export default function Navbar() {
   }, [supabase]);
 
   const navItems = [
-    { name: "Find Work", href: "/", icon: Home },
+    { name: "Home", href: "/", icon: Home },
     { name: "My Jobs", href: "/my-jobs", icon: Briefcase },
     { name: "Messages", href: "/messages", icon: MessageSquare },
   ];

@@ -79,7 +79,7 @@ export default async function Home() {
         
         {/* Header - Standardized to match My Jobs & Messages */}
         <h1 className="mb-6 text-2xl font-bold text-brand-blue">
-          {isSeeker ? "My Postings" : "Job Feed"}
+          {isSeeker ? "My Postings" : "Home"}
         </h1>
 
         {/* Feed Content */}
