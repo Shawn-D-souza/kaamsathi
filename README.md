@@ -1,17 +1,26 @@
 # **KaamSaathi**
 
-A peer-to-peer service marketplace where users can post jobs and find help, or bid on jobs to offer their services.
+A peer-to-peer marketplace where users can **post jobs**, **place bids**, and **hire providers** for local or remote tasks.  
 
-**Live Demo:** [https://kaamsaathi.netlify.app/](https://kaamsaathi.netlify.app/)
 
-## **Core Concept**
+**🔗 Live Demo:** https://kaamsaathi.netlify.app/
 
-KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.com but simplified for quick local or remote tasks. The core of the app is a **dual-role system** where every user can be both a "Seeker" and a "Provider," toggled instantly from their profile.
+## 🧠 Core Concept
 
-* **"Seekers"** post a job or task they need done (e.g., "Need help moving furniture" or "Fix my script").  
-* **"Providers"** browse available jobs—filtered by their service zones—and place bids.  
-* The **Seeker** reviews bids and accepts one (or more), creating a private realtime chat to start the job.  
-* Once the work is done, the Seeker can **Mark as Complete**.
+KaamSaathi is a simple and fast P2P marketplace optimized for everyday tasks—local or remote.
+
+Every user can instantly switch between two roles:
+
+- **Seeker** → Posts jobs needing help  
+- **Provider** → Browses jobs & places bids  
+
+**Flow:**
+
+1. Seeker posts a job (with budget, description, location, radius).  
+2. Providers within the visibility radius (or anywhere for remote jobs) can bid.  
+3. Seeker accepts one or multiple bids.  
+4. A private realtime chat opens.  
+5. Job is completed → Provider gets rated.
 
 ## **🚀 Tech Stack**
 
@@ -22,82 +31,108 @@ KaamSaathi is a P2P marketplace built on a bidding model, similar to Freelancer.
 * **Icons:** [Lucide React](https://lucide.dev/)  
 * **Deployment:** [Netlify](https://www.netlify.com/) / [Vercel](https://vercel.com/)
 
-## **🎨 Brand & UI**
+## 🎨 Branding & UI
 
-* **Primary (Blue):** \#005A9C (Used for headers, active states)  
-* **Accent (Orange):** \#FF6700 (Used for buttons, call-to-actions)  
-* **Background:** White / Light Gray (\#F9FAFB)  
-* **Dark Mode:** Fully supported 🌙
+| Usage | Color |
+|-------|--------|
+| Primary | `#005A9C` |
+| Accent | `#FF6700` |
+| Background | `#F9FAFB` |
 
-## **🛠️ Features**
+## 🛠️ Features
 
-### **Authentication & User**
+### 🔐 Authentication & User System
 
-* **Secure Auth:** Sign up/in with Email & Password (Supabase Auth).  
-* **Role Switching:** One-tap toggle between "Seeker" and "Provider" modes.  
-* **Profile Management:** Edit name and upload Profile Picture (Supabase Storage).  
-* **Password Reset:** Full flow with email confirmation.
+- Email/password signup & login (Supabase Auth)  
+- Secure role-switching: Seeker ↔ Provider  
+- Profile editing & avatar upload  
+- Password reset flow  
 
-### **Marketplace (Seeker)**
+### 📌 Marketplace — Seeker
 
-* **Post a Job:** Create listings with title, description, budget, and deadline.  
-* **Interactive Maps:** Pinpoint the exact job location on a map and set a **Visibility Radius** (e.g., 5km) to control who sees the job.  
-* **Multi-Hire:** Specify the number of people needed (e.g., "Need 3 people for moving"). You can accept multiple bids for a single job until all spots are filled.  
-* **Manage Bids:** View all incoming bids, check provider profiles, and accept the best offers.  
-* **Job Completion:** Mark jobs as "Done" to close the loop.
+- Post jobs with title, description, budget, deadline  
+- Select job location on map  
+- Control job visibility using **radius**  
+- Hire multiple providers for the same job  
+- Manage bids, accept/reject  
+- Mark job as completed  
+- Rate and review providers  
 
-### **Marketplace (Provider)**
+### 🎯 Marketplace — Provider
 
-* **Smart Job Feed:** Jobs are filtered automatically based on:  
-  1. **Remote Jobs:** Visible to everyone globally.  
-  2. **Local Jobs:** Only visible if they overlap with your defined "Service Zones."  
-* **Service Zones:** Providers can define multiple circular zones on the map (center \+ radius) where they are willing to work.  
-* **Bidding:** Place competitive bids on jobs you want to do.  
-* **My Bids:** Track the status of your sent bids (Pending/Accepted/Rejected).
+- Smart job feed filtered by:
+  - Remote jobs  
+  - Local jobs within your service zones  
+- Define multiple **Service Zones** (circular radius areas)  
+- Place and track bids  
+- View bid status (Pending / Accepted / Rejected)
 
-### **Communication**
+### 💬 Communication
 
-* **Realtime Chat:** Instant 1-on-1 messaging between Seeker and Provider(s) upon job acceptance.  
-* **Status Updates:** Live updates when jobs are completed or bids are accepted.
+- Realtime chat between Seekers & accepted Providers  
+- Live status updates for bids and job completion  
 
-## **🏃‍♂️ Getting Started Locally**
+## 🏃‍♂️ Getting Started Locally
 
-### **1\. Prerequisites**
+### 1. Prerequisites
 
-* Node.js (v18 or later)  
-* npm / pnpm / yarn  
-* A Supabase account
+- Node.js v18+  
+- npm / pnpm / yarn  
+- A Supabase account  
 
-### **2\. Set Up Supabase**
+### 2. Supabase Setup
 
-1. **Create Project:** Create a new project in your Supabase dashboard.  
-2. **Database:** Go to the **SQL Editor** and run the scripts found in the /supabase folder of this repo in the following order:  
-   1. schema.sql (Profiles & Triggers)  
-   2. jobs.sql (Jobs table & Policies)  
-   3. bids.sql (Bids table & Policies)  
-   4. messages.sql (Chat system)  
-   5. locations.sql (Provider Zones & PostGIS setup)  
-   6. rpc.sql (Geospatial filtering function)  
-   7. storage.sql (Storage policies)  
-3. **Storage:**  
-   * Go to **Storage** and create a new public bucket named avatars.  
-   * Set file size limit to 2MB and allowed MIME types to image/\*.  
-4. **Env Keys:** Go to **Settings** \> **API** and copy your URL and Anon Key.
+1. **Create a new project** in the Supabase dashboard.  
+2. **Run SQL scripts** from the `/supabase` folder in this order:
 
-### **3\. Install & Run**
+```
+1. schema.sql
+2. jobs.sql
+3. bids.sql
+4. messages.sql
+5. reviews.sql
+6. locations.sql
+7. rpc.sql
+8. storage.sql
+```
 
-1. Clone the repository:  
-   git clone \[https://github.com/Shawn-D-souza/kaamsathi.git\](https://github.com/Shawn-D-souza/kaamsathi.git)  
-   cd kaamsathi
+3. **Storage Setup**
+   - Create a **public bucket** named `avatars`
+   - Limit file size to **2MB**
+   - Allow MIME types: `image/*`
 
-2. Install dependencies:  
-   \# Install dependencies  
-   npm install
+4. **API Keys**
+   - Go to **Settings → API**
+   - Copy:  
+     - `Project URL`  
+     - `Anon Key`
 
-3. Create your environment file:  
-   Create a .env.local file in the root directory:  
-   NEXT\_PUBLIC\_SUPABASE\_URL=your\_supabase\_project\_url  
-   NEXT\_PUBLIC\_SUPABASE\_ANON\_KEY=your\_supabase\_anon\_key
+### 3. Install & Run the Project
 
-4. Run the development server:  
-   npm run dev  
+#### Clone the repo
+
+```bash
+git clone https://github.com/Shawn-D-souza/kaamsathi.git
+cd kaamsathi
+```
+
+#### Install dependencies
+
+```bash
+npm install
+```
+
+#### Create environment variables
+
+Create a file: `.env.local`
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+#### Start the development server
+
+```bash
+npm run dev
+```
