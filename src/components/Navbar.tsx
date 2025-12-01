@@ -12,18 +12,48 @@ export default function Navbar() {
   const supabase = createClient();
 
   useEffect(() => {
-    const checkRole = async () => {
+    let channel: any;
+
+    const setupListener = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      if (!user) return;
+
+      // 1. Initial Fetch
+      const fetchRole = async () => {
         const { data } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
         setIsSeeker(data?.role === "seeker");
-      }
+      };
+      fetchRole();
+
+      // 2. Realtime Listener (Updates instantly when you switch in Profile)
+      channel = supabase
+        .channel('navbar-role-listener')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${user.id}`,
+          },
+          (payload: any) => {
+            // Update state instantly based on the change
+            setIsSeeker(payload.new.role === "seeker");
+          }
+        )
+        .subscribe();
     };
-    checkRole();
+
+    setupListener();
+
+    // Cleanup subscription on unmount
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
   const navItems = [
@@ -34,7 +64,6 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/95 md:block">
-      {/* Restored to max-w-screen-2xl to fill the screen */}
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         
         {/* Left: Brand & Nav */}
@@ -65,6 +94,7 @@ export default function Navbar() {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-4">
+          {/* This button will now appear/disappear instantly */}
           {isSeeker && (
             <Link
               href="/jobs/new"
