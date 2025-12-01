@@ -11,22 +11,35 @@ export default async function Home() {
   if (!user) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center p-6 bg-gray-50 dark:bg-black">
-        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-center">
-          <h1 className="text-3xl font-bold text-brand-blue mb-4">
-            KaamSaathi
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-8">
-            The peer-to-peer marketplace for students.
-            <br />
-            Find help locally or remote.
-          </p>
-          
-          <div className="space-y-3">
-            <Link 
-              href="/auth" 
-              className="btn-primary w-full"
-            >
-              Get Started
+        <div className="w-full max-w-md space-y-8">
+          {/* Main Card */}
+          <div className="rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-center transition-all hover:shadow-xl">
+            <h1 className="text-3xl font-bold text-brand-blue mb-4 tracking-tight">
+              KaamSaathi
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+              The peer-to-peer marketplace for students.
+              <br />
+              Find help locally or remote.
+            </p>
+            
+            <div className="space-y-3">
+              <Link 
+                href="/auth" 
+                className="btn-primary w-full shadow-md shadow-orange-500/20"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+
+          {/* Legal Links (Discreetly placed below card) */}
+          <div className="flex justify-center gap-6 text-xs text-gray-400 dark:text-zinc-600">
+            <Link href="/legal/terms" className="hover:text-gray-600 dark:hover:text-zinc-400 transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/legal/privacy" className="hover:text-gray-600 dark:hover:text-zinc-400 transition-colors">
+              Privacy Policy
             </Link>
           </div>
         </div>
