@@ -10,14 +10,13 @@ export default async function Home() {
 
   if (!user) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center p-6 bg-gray-50 dark:bg-black">
+      <div className="flex min-h-dvh flex-col items-center justify-center p-6">
         <div className="w-full max-w-md space-y-8">
-          {/* Main Card */}
-          <div className="rounded-xl bg-white p-8 shadow-lg dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-center transition-all hover:shadow-xl">
+          <div className="card-surface rounded-xl p-8 text-center">
             <h1 className="text-3xl font-bold text-brand-blue mb-4 tracking-tight">
               KaamSaathi
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            <p className="text-[var(--muted)] mb-8 leading-relaxed">
               The peer-to-peer marketplace for students.
               <br />
               Find help locally or remote.
@@ -26,19 +25,18 @@ export default async function Home() {
             <div className="space-y-3">
               <Link 
                 href="/auth" 
-                className="btn-primary w-full shadow-md shadow-orange-500/20"
+                className="btn-primary w-full"
               >
                 Get Started
               </Link>
             </div>
           </div>
 
-          {/* Legal Links (Discreetly placed below card) */}
-          <div className="flex justify-center gap-6 text-xs text-gray-400 dark:text-zinc-600">
-            <Link href="/legal/terms" className="hover:text-gray-600 dark:hover:text-zinc-400 transition-colors">
+          <div className="flex justify-center gap-6 text-xs text-[var(--muted)]">
+            <Link href="/legal/terms" className="hover:text-[var(--primary)] transition-colors">
               Terms of Service
             </Link>
-            <Link href="/legal/privacy" className="hover:text-gray-600 dark:hover:text-zinc-400 transition-colors">
+            <Link href="/legal/privacy" className="hover:text-[var(--primary)] transition-colors">
               Privacy Policy
             </Link>
           </div>
@@ -73,25 +71,22 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-black">
-      {/* Main Content Container */}
+    <div className="min-h-dvh">
       <div className="mx-auto max-w-screen-2xl px-6 py-8">
         
-        {/* Header - Standardized to match My Jobs & Messages */}
-        <h1 className="mb-6 text-2xl font-bold text-brand-blue">
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-[var(--foreground)]">
           {isSeeker ? "My Postings" : "Home"}
         </h1>
 
-        {/* Feed Content */}
         {jobs.length === 0 ? (
-          <div className="mt-12 text-center rounded-2xl border-2 border-dashed border-gray-200 p-12 dark:border-zinc-800">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-800">
+          <div className="mt-12 text-center rounded-2xl border-2 border-dashed border-[var(--card-border)] p-12">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm">
               {isSeeker ? <Search className="text-gray-400" /> : <MapPin className="text-gray-400" />}
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <h3 className="text-lg font-medium text-[var(--foreground)]">
               {isSeeker ? "No jobs posted yet" : "No matching jobs found"}
             </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+            <p className="mt-2 text-sm text-[var(--muted)] max-w-xs mx-auto">
               {isSeeker 
                 ? "Create your first job posting to get started." 
                 : "Try adding more 'Service Zones' in your profile to see local jobs."}
@@ -107,7 +102,7 @@ export default async function Home() {
             ) : (
                 <Link
                 href="/profile/locations"
-                className="mt-4 inline-block rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-zinc-900 dark:border-zinc-700 dark:text-gray-300"
+                className="btn-secondary mt-4 inline-block"
               >
                 Manage Zones
               </Link>

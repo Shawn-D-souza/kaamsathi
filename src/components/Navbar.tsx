@@ -12,7 +12,6 @@ export default function Navbar() {
   const supabase = createClient();
 
   useEffect(() => {
-    // 1. Initial Fetch
     const fetchRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -26,13 +25,11 @@ export default function Navbar() {
     };
     fetchRole();
 
-    // 2. Custom Event Listener (For instant updates from Profile Page)
     const handleRoleUpdate = (event: CustomEvent) => {
       setIsSeeker(event.detail === "seeker");
     };
 
     window.addEventListener("role-updated", handleRoleUpdate as EventListener);
-
     return () => {
       window.removeEventListener("role-updated", handleRoleUpdate as EventListener);
     };
@@ -45,12 +42,12 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/95 md:block">
+    // Solid Blue Header - Frames the app perfectly
+    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-white/10 bg-brand-blue shadow-lg shadow-blue-900/5 dark:bg-[#0f172a] dark:border-slate-800 md:block">
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         
-        {/* Left: Brand & Nav */}
         <div className="flex items-center gap-10">
-          <Link href="/" className="text-2xl font-bold text-brand-blue tracking-tight">
+          <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">
             KaamSaathi
           </Link>
           
@@ -61,12 +58,13 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? "text-gray-900 dark:text-white"
-                      : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                      ? "text-white opacity-100"
+                      : "text-white/70 hover:text-white"
                   }`}
                 >
+                  <item.icon size={18} className={isActive ? "fill-white/20" : ""} />
                   {item.name}
                 </Link>
               );
@@ -74,13 +72,11 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/* Right: Actions */}
         <div className="flex items-center gap-4">
-          {/* This button will now appear/disappear instantly */}
           {isSeeker && (
             <Link
               href="/jobs/new"
-              className="flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2 text-sm font-bold text-white transition-transform hover:opacity-90 active:scale-95"
+              className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-blue shadow-sm transition-transform hover:bg-blue-50 active:scale-95"
             >
               <Plus size={18} />
               <span>Post Job</span>
@@ -89,7 +85,7 @@ export default function Navbar() {
 
           <Link 
             href="/profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:ring-2 hover:ring-brand-blue/20 dark:bg-zinc-800 dark:text-gray-300"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10"
           >
             <User size={20} />
           </Link>

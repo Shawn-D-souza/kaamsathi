@@ -5,21 +5,41 @@
 @theme {
   --color-brand-blue: #005A9C;
   --color-brand-orange: #FF6700;
-  --color-brand-text: #212121;
-  --color-brand-bg: #FFFFFF;
   
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* LIGHT MODE */
+  --background: #f0f9ff; 
+  --foreground: #0c4a6e;
+  
+  --card-bg: #ffffff;
+  --card-border: #bae6fd;
+  
+  --primary: #005A9C;
+  --accent: #FF6700;
+  --muted: #64748b;
+  
+  --nav-bg: rgba(240, 249, 255, 0.95);
+  --nav-border: #bae6fd;
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #ededed;
+  /* DARK MODE FIXES */
+  --background: #020817; /* Deepest Navy */
+  --foreground: #f8fafc; /* Brighter White text for readability */
+  
+  /* Lighter Card Background for better contrast */
+  --card-bg: #1e293b;    /* Slate 800 - Clearly distinct from background */
+  --card-border: #334155; /* Slate 700 - Visible border */
+
+  --primary: #38bdf8;
+  --muted: #cbd5e1; /* Slate 300 - Lighter muted text */
+  
+  --nav-bg: rgba(30, 41, 59, 0.95); /* Matches card bg */
+  --nav-border: #334155;
 }
 
 @layer base {
@@ -29,26 +49,39 @@
   }
   
   body {
-    /* 3. Bind Body to Variables */
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
+    
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+      linear-gradient(to bottom, var(--background), var(--background));
+    background-attachment: fixed;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply flex items-center justify-center rounded-xl bg-brand-orange px-4 py-3 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100;
+    @apply flex items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-red-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] hover:shadow-orange-500/30 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100;
   }
   
   .btn-secondary {
-    @apply flex items-center justify-center rounded-xl bg-brand-blue px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100;
+    @apply flex items-center justify-center rounded-xl bg-white border border-blue-200 px-4 py-3 text-sm font-bold text-sky-900 transition-all hover:bg-blue-50 active:scale-[0.98] dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:bg-slate-600;
   }
 
-  .input-field {
-    @apply block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-brand-blue focus:bg-white focus:ring-1 focus:ring-brand-blue dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-brand-blue;
+  .card-surface {
+    @apply bg-[var(--card-bg)] border border-[var(--card-border)] shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  /* Badges - Brightened for dark mode */
+  .badge-success {
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30;
+  }
+  .badge-info {
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30;
+  }
+  .badge-neutral {
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600;
   }
 }
