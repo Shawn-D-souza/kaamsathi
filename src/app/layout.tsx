@@ -4,6 +4,7 @@ import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { createClient } from "@/utils/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +21,14 @@ export const metadata: Metadata = {
   description: "Peer-to-peer job marketplace",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -36,17 +40,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Top Navigation (Desktop) */}
           <Navbar />
 
-          {/* Main Layout */}
-          <div className="min-h-screen w-full bg-[var(--background)] transition-colors duration-200 pt-0 md:pt-16">
-            <main className="min-h-screen pb-24 md:pb-12">
+          <div className="min-h-screen w-full bg-[var(--background)] transition-colors duration-200">
+            <main className="min-h-screen">
               {children}
             </main>
             
-            {/* Bottom Navigation (Mobile) */}
-            <BottomNav />
+            {user && <BottomNav />}
           </div>
         </ThemeProvider>
       </body>
