@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KaamSaathi</string>
+    <string name="title_activity_main">KaamSaathi</string>
+    <string name="package_name">com.kaamsaathi.app</string>
+    <string name="custom_url_scheme">com.kaamsaathi.app</string>
+</resources>
