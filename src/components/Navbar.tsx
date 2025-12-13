@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image"; 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Briefcase, MessageSquare, User, Plus, Zap, LogIn } from "lucide-react";
@@ -51,8 +52,15 @@ export default function Navbar() {
         {/* Logo & Nav */}
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-blue text-white shadow-lg shadow-blue-500/20">
-              <Zap size={18} fill="currentColor" />
+            {/* Replaced Zap icon with Image */}
+            <div className="relative h-8 w-8 overflow-hidden rounded-lg shadow-lg shadow-blue-500/20">
+              <Image 
+                src="/logo.png" 
+                alt="KaamSaathi Logo" 
+                fill 
+                className="object-cover"
+                priority
+              />  
             </div>
             KaamSaathi
           </Link>

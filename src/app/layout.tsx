@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
@@ -19,6 +19,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "KaamSaathi",
   description: "Peer-to-peer job marketplace",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#005A9C",
 };
 
 export default async function RootLayout({

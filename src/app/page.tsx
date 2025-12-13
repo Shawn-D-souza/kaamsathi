@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { 
@@ -32,8 +33,14 @@ export default async function Home() {
         {/* MOBILE HEADER */}
         <div className="flex-none flex items-center justify-between p-6 lg:hidden z-50">
            <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-              <div className="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                <Zap size={18} fill="currentColor" />
+              {/* Replaced Zap Icon with Image */}
+              <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-lg shadow-blue-500/20">
+                 <Image 
+                   src="/logo.png" 
+                   alt="KaamSaathi" 
+                   fill 
+                   className="object-cover" 
+                 />
               </div>
               KaamSaathi
            </div>
