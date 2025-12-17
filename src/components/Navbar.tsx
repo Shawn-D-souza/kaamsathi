@@ -46,7 +46,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-slate-100 bg-white/80 backdrop-blur-md dark:bg-[#020817]/80 dark:border-slate-800 md:block">
+    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-slate-100 bg-white/80 backdrop-blur-md dark:bg-[#020817]/80 dark:border-slate-800 md:block pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         
         {/* Logo & Nav */}

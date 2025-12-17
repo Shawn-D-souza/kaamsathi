@@ -31,7 +31,7 @@ export default async function Home() {
       <div className="h-dvh overflow-hidden lg:h-auto lg:overflow-auto lg:min-h-screen flex flex-col selection:bg-brand-orange/20">
         
         {/* MOBILE HEADER */}
-        <div className="flex-none flex items-center justify-between p-6 lg:hidden z-50">
+        <div className="flex-none flex items-center justify-between p-6 pt-[calc(0.1rem+env(safe-area-inset-top))] lg:hidden z-50">
            <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
               {/* Replaced Zap Icon with Image */}
               <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-lg shadow-blue-500/20">
@@ -205,7 +205,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-dvh pt-6 lg:pt-24 pb-24">
+    <div className="min-h-dvh pt-[calc(1.5rem+env(safe-area-inset-top))] lg:pt-24 pb-24">
       <div className="mx-auto max-w-screen-2xl px-6 py-8">
         <div className="flex justify-between items-end mb-8">
            <div>
