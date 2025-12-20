@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import BackButtonHandler from "@/components/BackButtonHandler";
+import OfflineBanner from "@/components/OfflineBanner"; 
 
 import { createClient } from "@/utils/supabase/server";
 import "./globals.css";
@@ -66,6 +67,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         >
           {/* Native hardware integration */}
           <BackButtonHandler />
+          
+          {/* Offline Notification
+            This will display a banner if the internet connection is lost while using the app.
+          */}
+          <OfflineBanner />
           
           <Navbar />
 
