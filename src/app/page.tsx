@@ -30,10 +30,9 @@ export default async function Home() {
     return (
       <div className="h-dvh overflow-hidden lg:h-auto lg:overflow-auto lg:min-h-screen flex flex-col selection:bg-brand-orange/20">
         
-        {/* MOBILE HEADER */}
+        {/* MOBILE HEADER - Safe Area Preserved */}
         <div className="flex-none flex items-center justify-between p-6 pt-[calc(0.1rem+env(safe-area-inset-top))] lg:hidden z-50">
-           <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-              {/* Replaced Zap Icon with Image */}
+           <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-brand-blue">
               <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-lg shadow-blue-500/20">
                  <Image 
                    src="/logo.png" 
@@ -205,16 +204,20 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-dvh pt-[calc(1.5rem+env(safe-area-inset-top))] lg:pt-24 pb-24">
-      <div className="mx-auto max-w-screen-2xl px-6 py-8">
-        <div className="flex justify-between items-end mb-8">
+    // REDUCED PADDING: 
+    // - Changed 1.5rem to 0.2rem (almost flush with status bar safety area)
+    // - md:pt-0 handles desktop reset
+    <div className="min-h-dvh pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
+      
+      {/* - Reduced vertical padding from py-8 to py-4 
+        - Maintained md:pt-24 for Desktop Fixed Header clearance 
+      */}
+      <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24 pb-8">
+        <div className="flex justify-between items-end mb-6">
            <div>
              <h1 className="text-3xl font-extrabold tracking-tight">
                {isSeeker ? "My Postings" : "Job Feed"}
              </h1>
-             <p className="text-muted mt-1">
-                {isSeeker ? "Manage your active job listings." : "Opportunities matching your zones."}
-             </p>
            </div>
            
            {isSeeker && (

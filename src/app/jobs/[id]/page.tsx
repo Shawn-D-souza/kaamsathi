@@ -59,9 +59,9 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
   });
 
   return (
-    <main className="min-h-dvh bg-gray-50/50 pb-24 md:py-12 dark:bg-black">
+    <main className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
       {/* Updated Width to max-w-screen-2xl to remove side gaps */}
-      <div className="mx-auto max-w-screen-2xl px-4 md:px-6">
+      <div className="mx-auto max-w-screen-2xl px-4 py-4 md:pt-24 md:px-6">
         
         {/* Navigation */}
         <div className="mb-6">

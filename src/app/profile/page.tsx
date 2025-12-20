@@ -118,10 +118,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-dvh pb-24">
-      <div className="mx-auto max-w-screen-xl px-6 py-8">
+    // FIXED: Mobile Safe Area + Reduced Padding
+    <div className="min-h-dvh pb-24 pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
+      <div className="mx-auto max-w-screen-xl px-6 py-4 md:pt-24">
         
-        <h1 className="mb-8 text-3xl font-extrabold tracking-tight text-[var(--foreground)]">
+        <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-[var(--foreground)]">
           My Profile
         </h1>
 

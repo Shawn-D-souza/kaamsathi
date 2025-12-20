@@ -39,12 +39,12 @@ export default function PostJobForm() {
   const totalCost = (parseFloat(budget) || 0) * (parseInt(quantity) || 0);
 
   return (
-    <div className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black">
+    <div className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
       {/* Fixed: Widened container to max-w-screen-2xl to remove side gaps */}
-      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+      <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24">
         
         {/* Header */}
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-6 flex items-center gap-4">
           <Link
             href="/"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm transition-colors hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"

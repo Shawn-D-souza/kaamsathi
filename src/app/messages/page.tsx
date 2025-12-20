@@ -17,13 +17,13 @@ export default async function MessagesPage() {
   const unwrap = (data: any) => Array.isArray(data) ? data[0] : data;
 
   return (
-    <main className="min-h-dvh pb-24">
-      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+  <main className="min-h-dvh pb-24 pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
+      <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24">
         
-        <header className="mb-8"><h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">Messages</h1></header>
+        <header className="mb-6"><h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">Messages</h1></header>
 
         {allConversations.length === 0 ? (
-          <div className="mt-12 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
+          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm"><MessageSquare className="h-8 w-8 text-gray-400" /></div>
             <h3 className="text-lg font-semibold text-[var(--foreground)]">No messages yet</h3>
             <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Chats appear here when a job is accepted.</p>

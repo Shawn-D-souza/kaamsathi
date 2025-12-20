@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image"; 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Briefcase, MessageSquare, User, Plus, Zap, LogIn } from "lucide-react";
+import { Home, Briefcase, MessageSquare, User, Plus, LogIn } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -29,10 +29,10 @@ export default function Navbar() {
     };
     fetchUser();
 
+    // Listen for role updates
     const handleRoleUpdate = (event: CustomEvent) => {
       setIsSeeker(event.detail === "seeker");
     };
-
     window.addEventListener("role-updated", handleRoleUpdate as EventListener);
     return () => {
       window.removeEventListener("role-updated", handleRoleUpdate as EventListener);
@@ -46,17 +46,18 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-slate-100 bg-white/80 backdrop-blur-md dark:bg-[#020817]/80 dark:border-slate-800 md:block pt-[env(safe-area-inset-top)]">
+    // SOLID BLUE HEADER (Restored Old Design)
+    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-white/10 bg-brand-blue shadow-lg shadow-blue-900/5 dark:bg-[#0f172a] dark:border-slate-800 md:block">
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         
-        {/* Logo & Nav */}
+        {/* Left Side: Logo + Nav Links */}
         <div className="flex items-center gap-10">
-          <Link href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            {/* Replaced Zap icon with Image */}
-            <div className="relative h-8 w-8 overflow-hidden rounded-lg shadow-lg shadow-blue-500/20">
+          <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-white">
+             {/* Logo Image */}
+             <div className="relative h-8 w-8 overflow-hidden rounded-lg shadow-md border border-white/20">
               <Image 
                 src="/logo.png" 
-                alt="KaamSaathi Logo" 
+                alt="KaamSaathi" 
                 fill 
                 className="object-cover"
                 priority
@@ -65,20 +66,22 @@ export default function Navbar() {
             KaamSaathi
           </Link>
           
+          {/* ONLY SHOW LINKS IF LOGGED IN */}
           {user && (
-            <nav className="flex items-center gap-1 rounded-full bg-slate-100/50 p-1 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
+            <nav className="flex items-center gap-8">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-bold transition-all duration-200 ${
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-white text-brand-blue shadow-sm dark:bg-slate-700 dark:text-white"
-                        : "text-slate-500 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700/50"
+                        ? "text-white opacity-100"
+                        : "text-white/70 hover:text-white"
                     }`}
                   >
+                    <item.icon size={18} className={isActive ? "fill-white/20" : ""} />
                     {item.name}
                   </Link>
                 );
@@ -87,23 +90,23 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Actions */}
+        {/* Right Side: Action Buttons */}
         <div className="flex items-center gap-4">
           {user ? (
             <>
               {isSeeker && (
                 <Link
                   href="/jobs/new"
-                  className="group flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-brand-blue hover:-translate-y-0.5 active:scale-95 dark:bg-white dark:text-slate-900"
+                  className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-blue shadow-sm transition-transform hover:bg-blue-50 active:scale-95"
                 >
-                  <Plus size={16} className="transition-transform group-hover:rotate-90" />
+                  <Plus size={18} />
                   <span>Post Job</span>
                 </Link>
               )}
 
               <Link 
                 href="/profile"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10"
               >
                 <User size={20} />
               </Link>
@@ -111,7 +114,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/auth"
-              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-brand-blue dark:text-slate-300"
+              className="flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white transition-colors"
             >
               <LogIn size={18} />
               Sign In

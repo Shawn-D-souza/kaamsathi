@@ -36,26 +36,25 @@ export default async function MyJobsPage() {
   };
 
   return (
-    <main className="min-h-dvh pb-24">
-      <div className="mx-auto max-w-screen-2xl px-6 py-8">
+    <main className="min-h-dvh pb-24 pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
+      <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24">
         
-        {/* FIXED: Standardized to text-3xl font-extrabold tracking-tight */}
-        <header className="mb-8">
+        <header className="mb-6">
           <h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">My Activity</h1>
         </header>
 
         {isEmpty ? (
-          <div className="mt-12 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
+          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm"><Briefcase className="h-8 w-8 text-gray-400" /></div>
             <h3 className="text-lg font-semibold text-[var(--foreground)]">No activity yet</h3>
             <div className="mt-6 flex gap-3"><Link href="/jobs/new" className="btn-primary">Post Job</Link><Link href="/" className="btn-secondary">Find Work</Link></div>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-10">
             {postedJobs.length > 0 && (
               <section>
-                <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><Briefcase size={16} /> Jobs You Posted</h2>
-                <div className="space-y-4">
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><Briefcase size={16} /> Jobs You Posted</h2>
+                <div className="space-y-3">
                   {postedJobs.map((job: any) => (
                     <Link key={job.id} href={`/jobs/${job.id}/bids`} className="card-surface group relative block w-full overflow-hidden rounded-2xl p-5 hover:border-brand-blue/30">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -75,8 +74,8 @@ export default async function MyJobsPage() {
             )}
             {myBids.length > 0 && (
               <section>
-                <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><FileText size={16} /> Your Bids</h2>
-                <div className="space-y-4">
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><FileText size={16} /> Your Bids</h2>
+                <div className="space-y-3">
                   {myBids.map((bid: any) => (
                     <Link key={bid.id} href={bid.jobs?.id ? `/jobs/${bid.jobs.id}` : '#'} className="card-surface group relative block w-full overflow-hidden rounded-2xl p-5 hover:border-brand-blue/30">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

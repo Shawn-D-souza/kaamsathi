@@ -50,7 +50,7 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
   }
 
   // 4. Header Info
-  const chatTitle = job.title; // Fixed: Added this line back
+  const chatTitle = job.title; 
   const ownerData = Array.isArray(job.owner) ? job.owner[0] : job.owner;
   const ownerName = ownerData?.full_name || "Job Owner";
   
@@ -68,7 +68,7 @@ export default async function ChatPage({ params }: { params: Promise<{ jobId: st
   const showComplete = isOwner && job.status === 'in_progress';
 
   return (
-    <div className="flex h-dvh flex-col bg-gray-50 dark:bg-black pb-16">
+    <div className="flex h-dvh flex-col bg-gray-50 dark:bg-black pb-16 pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-16">
       <header className="flex items-center gap-3 bg-white px-4 py-3 shadow-sm dark:bg-zinc-900 dark:border-b dark:border-zinc-800 z-10">
         <Link href="/messages" className="text-gray-600 dark:text-gray-400">
           <ArrowLeft size={20} />
