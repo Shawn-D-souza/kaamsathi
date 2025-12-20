@@ -43,9 +43,17 @@
 }
 
 @layer base {
+  /* NATIVE APP FEEL OVERRIDES */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
   html {
     scroll-behavior: smooth;
-    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none; /* Prevents "pull to refresh" rubber-banding */
+    user-select: none;           /* Prevents text selection like a website */
+    -webkit-user-select: none;
   }
   
   body {
@@ -58,6 +66,12 @@
       radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
       linear-gradient(to bottom, var(--background), var(--background));
     background-attachment: fixed;
+  }
+
+  /* Re-enable text selection for form inputs */
+  input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
   }
 }
 

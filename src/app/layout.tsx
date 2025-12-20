@@ -52,29 +52,15 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Native hardware integration */}
           <BackButtonHandler />
-          
-          {/* Offline Notification */}
           <OfflineBanner />
-
-          {/* Top Navigation (Desktop) */}
           <Navbar />
 
-          {/* Main Layout 
-              - FIXED: Removed md:pt-16 so Landing Page has NO GAP.
-              - Pages that need space (like Dashboard) must add their own padding.
-          */}
           <div className="min-h-screen w-full bg-[var(--background)] transition-colors duration-200 pt-0">
-            
-            {/* Main Content 
-                - pb-24: Adds padding at bottom ONLY if user is logged in (for BottomNav)
-            */}
             <main className={`min-h-screen ${user ? 'pb-24 md:pb-12' : ''}`}>
               {children}
             </main>
             
-            {/* Bottom Navigation (Mobile) - Only visible when logged in */}
             {user && <BottomNav />}
           </div>
         </ThemeProvider>
