@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import BottomNav from "@/components/BottomNav";
-import Navbar from "@/components/Navbar";
+
 import { ThemeProvider } from "@/components/ThemeProvider";
+import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
+import BackButtonHandler from "@/components/BackButtonHandler";
+
 import { createClient } from "@/utils/supabase/server";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,18 +34,29 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
+interface RootLayoutProps {
   children: React.ReactNode;
-}>) {
+}
+
+/**
+ * RootLayout
+ * The primary layout wrapper for the KaamSaathi application.
+ * Handles global font variables, theme providers, and core navigation.
+ */
+export default async function RootLayout({ children }: RootLayoutProps) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 transition-colors duration-200 dark:bg-black dark:text-gray-100`}
+        className={`
+          ${geistSans.variable} 
+          ${geistMono.variable} 
+          antialiased bg-white text-gray-900 
+          transition-colors duration-200 
+          dark:bg-black dark:text-gray-100
+        `}
       >
         <ThemeProvider
           attribute="class"
@@ -50,6 +64,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          {/* Native hardware integration */}
+          <BackButtonHandler />
+          
           <Navbar />
 
           <div className="min-h-screen w-full bg-[var(--background)] transition-colors duration-200">
