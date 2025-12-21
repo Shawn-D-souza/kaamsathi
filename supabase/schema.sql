@@ -6,6 +6,15 @@ create table public.profiles (
   avatar_url text,
   role text check (role in ('seeker', 'provider')) default 'seeker',
   
+  -- Notification Preferences
+  preferences jsonb default '{
+    "notifications": {
+      "messages": {"push": true, "email": true},
+      "bids": {"push": true, "email": true},
+      "job_updates": {"push": true, "email": true}
+    }
+  }'::jsonb,
+  
   constraint username_length check (char_length(full_name) >= 3)
 );
 

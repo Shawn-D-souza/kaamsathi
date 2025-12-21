@@ -4,7 +4,12 @@ create table public.messages (
   created_at timestamp with time zone default now() not null,
   job_id uuid not null references public.jobs(id) on delete cascade,
   sender_id uuid not null references public.profiles(id) on delete cascade,
-  content text not null check (char_length(content) > 0)
+  content text not null check (char_length(content) > 0),
+  
+  -- New Professional Chat Features
+  type text default 'text' check (type in ('text', 'image', 'system', 'location')),
+  read_at timestamp with time zone,
+  deleted_at timestamp with time zone
 );
 
 -- 2. Enable RLS
@@ -15,6 +20,7 @@ alter table public.messages enable row level security;
 create policy "Participants can view messages"
   on public.messages for select
   using (
+    (deleted_at is null) and -- Hide deleted messages
     exists (
       select 1 from public.jobs
       where jobs.id = messages.job_id
@@ -56,6 +62,10 @@ create policy "Participants can send messages"
     )
   );
 
+-- Allow users to "soft delete" (update) their own messages
+create policy "Senders can update (soft delete) their messages"
+  on public.messages for update
+  using ( auth.uid() = sender_id );
+
 -- 4. Realtime
--- Enable realtime for messages table
 alter publication supabase_realtime add table public.messages;
