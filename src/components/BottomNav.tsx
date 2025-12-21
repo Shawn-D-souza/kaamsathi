@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Briefcase, MessageSquare, User } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState(pathname);
+  const [isNative, setIsNative] = useState(false);
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -20,8 +22,17 @@ export default function BottomNav() {
     setActiveTab(pathname);
   }, [pathname]);
 
+  useEffect(() => {
+    // Only apply the extra padding if running as a Native App (APK)
+    setIsNative(Capacitor.isNativePlatform());
+  }, []);
+
   return (
-    <div className="fixed bottom-0 left-0 z-50 w-full border-t border-blue-200 bg-sky-50/95 pb-safe pt-2 backdrop-blur-xl transition-colors duration-300 dark:border-slate-800 dark:bg-[#0f172a]/95 md:hidden">
+    <div 
+      className={`fixed bottom-0 left-0 z-50 w-full border-t border-blue-200 bg-sky-50/95 pt-2 backdrop-blur-xl transition-all duration-300 dark:border-slate-800 dark:bg-[#0f172a]/95 md:hidden ${
+        isNative ? "pb-5" : "pb-2"
+      }`}
+    >
       <nav className="flex h-16 items-center justify-around px-4 pb-2">
         {navItems.map((item) => {
           const isActive = activeTab === item.href;
