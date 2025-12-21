@@ -6,7 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-// --- APP INTERFACES ---
 export interface NotificationPreferences {
   notifications: {
     messages: { push: boolean; email: boolean }
@@ -15,7 +14,6 @@ export interface NotificationPreferences {
   }
 }
 
-// --- DATABASE DEFINITION ---
 export interface Database {
   public: {
     Tables: {
@@ -26,7 +24,7 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           role: 'seeker' | 'provider'
-          preferences: Json | null
+          preferences: Json
         }
         Insert: {
           id: string
@@ -34,7 +32,7 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           role?: 'seeker' | 'provider'
-          preferences?: Json | null
+          preferences?: Json
         }
         Update: {
           id?: string
@@ -42,7 +40,7 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           role?: 'seeker' | 'provider'
-          preferences?: Json | null
+          preferences?: Json
         }
         Relationships: [
           {
@@ -50,6 +48,116 @@ export interface Database {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      provider_locations: {
+        Row: {
+          id: string
+          created_at: string
+          provider_id: string
+          location: string
+          is_active: boolean
+          radius_meters: number
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          provider_id: string
+          location: string
+          is_active?: boolean
+          radius_meters?: number
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          provider_id?: string
+          location?: string
+          is_active?: boolean
+          radius_meters?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_locations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      jobs: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string | null // ADDED
+          owner_id: string
+          title: string
+          description: string
+          budget: number
+          deadline: string
+          category: string
+          status: 'open' | 'in_progress' | 'completed'
+          quantity: number
+          is_remote: boolean
+          location: any
+          radius_meters: number | null
+        }
+        Insert: {
+          owner_id: string
+          title: string
+          description: string
+          budget: number
+          deadline: string
+          category: string
+          updated_at?: string | null // ADDED
+          status?: 'open' | 'in_progress' | 'completed'
+          quantity?: number
+          is_remote?: boolean
+          location?: any
+          radius_meters?: number | null
+        }
+        Update: Partial<Database['public']['Tables']['jobs']['Insert']>
+        Relationships: [
+          {
+            foreignKeyName: "jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      bids: {
+        Row: {
+          id: string
+          created_at: string
+          job_id: string
+          bidder_id: string
+          amount: number
+          status: 'pending' | 'accepted' | 'rejected'
+        }
+        Insert: {
+          job_id: string
+          bidder_id: string
+          amount: number
+          status?: 'pending' | 'accepted' | 'rejected'
+        }
+        Update: Partial<Database['public']['Tables']['bids']['Insert']>
+        Relationships: [
+          {
+            foreignKeyName: "bids_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bids_bidder_id_fkey"
+            columns: ["bidder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
@@ -66,25 +174,12 @@ export interface Database {
           deleted_at: string | null
         }
         Insert: {
-          id?: string
-          created_at?: string
           job_id: string
           sender_id: string
           content: string
           type?: 'text' | 'image' | 'system' | 'location'
-          read_at?: string | null
-          deleted_at?: string | null
         }
-        Update: {
-          id?: string
-          created_at?: string
-          job_id?: string
-          sender_id?: string
-          content?: string
-          type?: 'text' | 'image' | 'system' | 'location'
-          read_at?: string | null
-          deleted_at?: string | null
-        }
+        Update: Partial<Database['public']['Tables']['messages']['Insert']>
         Relationships: [
           {
             foreignKeyName: "messages_job_id_fkey"
@@ -114,11 +209,9 @@ export interface Database {
           resource_id: string | null
           resource_url: string | null
           is_read: boolean
-          metadata: Json | null
+          metadata: Json
         }
         Insert: {
-          id?: string
-          created_at?: string
           user_id: string
           actor_id?: string | null
           type: 'message' | 'bid' | 'job_update' | 'system'
@@ -127,21 +220,9 @@ export interface Database {
           resource_id?: string | null
           resource_url?: string | null
           is_read?: boolean
-          metadata?: Json | null
+          metadata?: Json
         }
-        Update: {
-          id?: string
-          created_at?: string
-          user_id?: string
-          actor_id?: string | null
-          type?: 'message' | 'bid' | 'job_update' | 'system'
-          title?: string
-          body?: string
-          resource_id?: string | null
-          resource_url?: string | null
-          is_read?: boolean
-          metadata?: Json | null
-        }
+        Update: Partial<Database['public']['Tables']['notifications']['Insert']>
         Relationships: [
           {
             foreignKeyName: "notifications_user_id_fkey"
@@ -149,130 +230,17 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notifications_actor_id_fkey"
-            columns: ["actor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      jobs: {
-        Row: {
-            id: string
-            created_at: string
-            owner_id: string
-            title: string
-            description: string
-            budget: number
-            deadline: string
-            category: string
-            status: 'open' | 'in_progress' | 'completed'
-            quantity: number
-            is_remote: boolean
-            location: unknown | null
-            radius_meters: number | null
-            updated_at: string
-        }
-        Insert: {
-            id?: string
-            owner_id: string
-            title: string
-            description: string
-            budget: number
-            deadline: string
-            category: string
-            status?: 'open' | 'in_progress' | 'completed'
-            quantity?: number
-            is_remote?: boolean
-            location?: unknown | null
-            radius_meters?: number | null
-            updated_at?: string
-        }
-        Update: Partial<Database['public']['Tables']['jobs']['Insert']>
-        Relationships: [
-          {
-            foreignKeyName: "jobs_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      bids: {
-        Row: {
-            id: string
-            created_at: string
-            job_id: string
-            bidder_id: string
-            amount: number
-            proposal_text: string | null
-            status: 'pending' | 'accepted' | 'rejected'
-        }
-        Insert: {
-            id?: string
-            created_at?: string
-            job_id: string
-            bidder_id: string
-            amount: number
-            proposal_text?: string | null
-            status?: 'pending' | 'accepted' | 'rejected'
-        }
-        Update: Partial<Database['public']['Tables']['bids']['Insert']>
-        Relationships: [
-          {
-            foreignKeyName: "bids_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bids_bidder_id_fkey"
-            columns: ["bidder_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
           }
         ]
       }
       reviews: {
-        Row: {
-          id: string
-          created_at: string
-          job_id: string
-          reviewer_id: string
-          reviewee_id: string
-          rating: number
-          comment: string | null
-        }
-        Insert: {
-          id?: string
-          created_at?: string
-          job_id: string
-          reviewer_id: string
-          reviewee_id: string
-          rating: number
-          comment?: string | null
-        }
+        Row: { id: string; rating: number; comment: string | null; job_id: string }
+        Insert: { rating: number; comment?: string | null; job_id: string }
         Update: Partial<Database['public']['Tables']['reviews']['Insert']>
-        Relationships: [
-          {
-            foreignKeyName: "reviews_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
     }
-    Views: {
-      [_ in never]: never
-    }
+    Views: { [_ in never]: never }
     Functions: {
       get_relevant_jobs: {
         Args: {
@@ -280,15 +248,27 @@ export interface Database {
         }
         Returns: {
           id: string
+          created_at: string
+          updated_at: string | null
+          owner_id: string
           title: string
+          description: string
+          budget: number
+          deadline: string
+          category: string
+          status: 'open' | 'in_progress' | 'completed'
+          quantity: number
+          is_remote: boolean
+          location: any
+          radius_meters: number | null
+          profiles: {
+            full_name: string | null
+            avatar_url: string | null
+          }
         }[]
       }
     }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    Enums: { [_ in never]: never }
+    CompositeTypes: { [_ in never]: never }
   }
 }

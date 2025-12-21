@@ -135,7 +135,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
               <div className="flex items-center gap-3 border-t border-gray-200 pt-4 sm:border-0 sm:pt-0 dark:border-zinc-700">
                  <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-zinc-700">
                     {job.profiles?.avatar_url ? (
-                      <img src={job.profiles.avatar_url} alt={job.profiles.full_name} className="h-full w-full object-cover" />
+                      <img src={job.profiles.avatar_url ?? undefined} alt={job.profiles.full_name ?? 'User'} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-gray-400">
                         <User size={18} />
