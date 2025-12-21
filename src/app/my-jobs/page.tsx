@@ -29,9 +29,9 @@ export default async function MyJobsPage() {
 
   const getBidStatusBadge = (status: string) => {
     switch (status) {
-      case 'accepted': return <span className="badge-success"><CheckCircle2 size={12} /> Accepted</span>;
+      case 'accepted': return <span className="badge-success"><CheckCircle2 size={12} /> Selected</span>;
       case 'rejected': return <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/10 px-2.5 py-1 text-xs font-bold text-red-600 border border-red-500/20 dark:text-red-400"><XCircle size={12} /> Rejected</span>;
-      default: return <span className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500/10 px-2.5 py-1 text-xs font-bold text-yellow-600 border border-yellow-500/20 dark:text-yellow-500"><AlertCircle size={12} /> Pending</span>;
+      default: return <span className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500/10 px-2.5 py-1 text-xs font-bold text-yellow-600 border border-yellow-500/20 dark:text-yellow-500"><AlertCircle size={12} /> Waiting</span>;
     }
   };
 
@@ -40,7 +40,7 @@ export default async function MyJobsPage() {
       <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24">
         
         <header className="mb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">My Activity</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">My Dashboard</h1>
         </header>
 
         {isEmpty ? (
@@ -53,7 +53,7 @@ export default async function MyJobsPage() {
           <div className="space-y-10">
             {postedJobs.length > 0 && (
               <section>
-                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><Briefcase size={16} /> Jobs You Posted</h2>
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><Briefcase size={16} /> Jobs I Posted</h2>
                 <div className="space-y-3">
                   {postedJobs.map((job: any) => (
                     <Link key={job.id} href={`/jobs/${job.id}/bids`} className="card-surface group relative block w-full overflow-hidden rounded-2xl p-5 hover:border-brand-blue/30">
@@ -74,7 +74,7 @@ export default async function MyJobsPage() {
             )}
             {myBids.length > 0 && (
               <section>
-                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><FileText size={16} /> Your Bids</h2>
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[var(--muted)]"><FileText size={16} /> Jobs I Applied To</h2>
                 <div className="space-y-3">
                   {myBids.map((bid: any) => (
                     <Link key={bid.id} href={bid.jobs?.id ? `/jobs/${bid.jobs.id}` : '#'} className="card-surface group relative block w-full overflow-hidden rounded-2xl p-5 hover:border-brand-blue/30">
@@ -84,7 +84,7 @@ export default async function MyJobsPage() {
                           <div className="flex flex-wrap items-center gap-3">{getBidStatusBadge(bid.status)}<span className="text-xs text-[var(--muted)]">Placed on {new Date(bid.created_at).toLocaleDateString()}</span></div>
                         </div>
                         <div className="flex items-center justify-between border-t border-[var(--card-border)] pt-3 sm:w-auto sm:border-0 sm:pt-0">
-                           <div className="sm:text-right sm:mr-6"><span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] block mb-0.5">Your Bid</span><div className="flex items-center gap-0.5 text-lg font-bold text-brand-blue"><IndianRupee size={16} className="mt-[2px]" />{bid.amount}</div></div>
+                           <div className="sm:text-right sm:mr-6"><span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] block mb-0.5">My Offer</span><div className="flex items-center gap-0.5 text-lg font-bold text-brand-blue"><IndianRupee size={16} className="mt-[2px]" />{bid.amount}</div></div>
                            <ChevronRight size={18} className="text-gray-300 group-hover:text-brand-blue" />
                         </div>
                       </div>

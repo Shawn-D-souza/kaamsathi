@@ -118,7 +118,6 @@ export default function ProfilePage() {
   }
 
   return (
-    // FIXED: Mobile Safe Area + Reduced Padding
     <div className="min-h-dvh pb-24 pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
       <div className="mx-auto max-w-screen-xl px-6 py-4 md:pt-24">
         
@@ -128,10 +127,8 @@ export default function ProfilePage() {
 
         <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
           
-          {/* --- LEFT COLUMN --- */}
           <div className="lg:col-span-1 space-y-6">
             
-            {/* Identity Card */}
             <div className="card-surface flex flex-col items-center rounded-3xl p-8">
               <Link 
                 href="/profile/edit"
@@ -159,13 +156,14 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-bold text-[var(--foreground)]">
                 {profile?.full_name || "User"}
               </h2>
-              <p className="text-sm text-[var(--muted)] capitalize">{profile?.role} Account</p>
+              <p className="text-sm text-[var(--muted)] capitalize">
+                {profile?.role === 'seeker' ? 'Hirer Account' : 'Worker Account'}
+              </p>
               
               <Link href="/profile/edit" className="mt-4 rounded-full bg-gray-100 px-4 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
                 Edit Profile
               </Link>
 
-              {/* Stats Row */}
               <div className="mt-8 grid w-full grid-cols-2 gap-4 border-t border-[var(--card-border)] pt-6">
                   <div className="text-center">
                       <span className="block text-2xl font-bold text-[var(--foreground)]">{stats.jobsCompleted}</span>
@@ -181,7 +179,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Role Switcher */}
             <div className="card-surface rounded-2xl p-4">
               <h3 className="mb-3 ml-1 text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
                 Switch Mode
@@ -197,7 +194,7 @@ export default function ProfilePage() {
                   }`}
                 >
                   <Search size={16} />
-                  Seeker
+                  Hire Mode
                 </button>
                 <button
                   onClick={() => toggleRole("provider")}
@@ -209,17 +206,15 @@ export default function ProfilePage() {
                   }`}
                 >
                   <Briefcase size={16} />
-                  Provider
+                  Work Mode
                 </button>
               </div>
             </div>
 
           </div>
 
-          {/* --- RIGHT COLUMN --- */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Account Settings */}
             <div className="card-surface overflow-hidden rounded-2xl">
               <div className="px-6 py-4 border-b border-[var(--card-border)] bg-gray-50/50 dark:bg-white/5">
                 <h3 className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
@@ -238,8 +233,8 @@ export default function ProfilePage() {
                         <MapPin size={20} />
                       </div>
                       <div>
-                        <p className="font-semibold text-[var(--foreground)]">Service Zones</p>
-                        <p className="text-xs text-[var(--muted)]">Manage where you work</p>
+                        <p className="font-semibold text-[var(--foreground)]">My Work Area</p>
+                        <p className="text-xs text-[var(--muted)]">Set where you can work</p>
                       </div>
                     </div>
                     <ChevronRight size={18} className="text-[var(--muted)]" />
@@ -264,7 +259,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Appearance */}
             {mounted && (
               <div className="card-surface rounded-2xl p-6">
                 <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
@@ -291,7 +285,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Legal & Sign Out */}
             <div className="space-y-4">
               <div className="card-surface overflow-hidden rounded-2xl">
                 <div className="divide-y divide-[var(--card-border)]">

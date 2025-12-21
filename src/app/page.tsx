@@ -58,17 +58,17 @@ export default async function Home() {
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.0] mb-6">
                   Get help with <br className="hidden lg:block" />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-sky-500">
-                    anything.
+                    any work.
                   </span>
                 </h1>
                 
                 <p className="text-lg sm:text-xl text-muted mb-10 max-w-sm mx-auto lg:max-w-2xl lg:mx-0 leading-relaxed font-medium">
-                  The simplest way to hire local help or find remote gigs. Verified neighbors, instant matches.
+                  The easiest way to hire people nearby or find work from anywhere. Trusted people, quick results.
                 </p>
                 
                 <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row justify-center lg:justify-start">
                   <Link href="/auth" className="btn-primary w-full sm:w-auto text-lg py-4 px-8 rounded-full">
-                    Post a Job
+                    Hire Someone
                     <ArrowRight size={20} className="ml-2" />
                   </Link>
                   
@@ -85,10 +85,10 @@ export default async function Home() {
 
                 <div className="hidden lg:flex mt-12 items-center gap-6 text-sm font-semibold text-muted">
                   <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-emerald-500" /> Direct Chat
+                    <CheckCircle size={16} className="text-emerald-500" /> Chat Directly
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-emerald-500" /> Verified Users
+                    <CheckCircle size={16} className="text-emerald-500" /> Verified People
                   </div>
                 </div>
               </div>
@@ -145,23 +145,23 @@ export default async function Home() {
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <h2 className="text-3xl font-extrabold tracking-tight mb-4">Why KaamSaathi?</h2>
-              <p className="text-muted text-lg">We bridge the gap between local skills and everyday needs.</p>
+              <p className="text-muted text-lg">We connect skilled people with your daily needs.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
                <FeatureCard 
                  icon={Zap} 
-                 title="Instant Matching" 
-                 desc="Our location-based matching helps you find the right people nearby in seconds." 
+                 title="Fast Search" 
+                 desc="Find the right people near you very quickly using our location search." 
                />
                <FeatureCard 
                  icon={ShieldCheck} 
-                 title="Verified & Safe" 
-                 desc="Chat directly with community members. View ratings and reviews before you commit." 
+                 title="Safe & Secure" 
+                 desc="Chat directly with people. Check their ratings and reviews before you hire." 
                />
                <FeatureCard 
                  icon={Globe} 
-                 title="Local & Remote" 
-                 desc="Whether you need physical help moving furniture or digital help with code, we handle both." 
+                 title="Local or Anywhere" 
+                 desc="Need help at home or work on a computer? We have people for both." 
                />
             </div>
           </div>
@@ -204,25 +204,19 @@ export default async function Home() {
   }
 
   return (
-    // REDUCED PADDING: 
-    // - Changed 1.5rem to 0.2rem (almost flush with status bar safety area)
-    // - md:pt-0 handles desktop reset
     <div className="min-h-dvh pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
       
-      {/* - Reduced vertical padding from py-8 to py-4 
-        - Maintained md:pt-24 for Desktop Fixed Header clearance 
-      */}
       <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24 pb-8">
         <div className="flex justify-between items-end mb-6">
            <div>
              <h1 className="text-3xl font-extrabold tracking-tight">
-               {isSeeker ? "My Postings" : "Job Feed"}
+               {isSeeker ? "Jobs I Posted" : "Jobs For You"}
              </h1>
            </div>
            
            {isSeeker && (
              <Link href="/jobs/new" className="hidden sm:inline-flex btn-primary gap-2 rounded-full">
-                <Zap size={18} /> Post New Job
+                <Zap size={18} /> Hire Someone
              </Link>
            )}
         </div>
@@ -233,21 +227,21 @@ export default async function Home() {
               {isSeeker ? <LayoutGrid className="text-muted" size={32} /> : <MapPin className="text-muted" size={32} />}
             </div>
             <h3 className="text-xl font-bold">
-              {isSeeker ? "No jobs posted yet" : "No jobs nearby"}
+              {isSeeker ? "You haven't posted any work" : "No jobs found"}
             </h3>
             <p className="mt-2 text-muted max-w-sm mx-auto leading-relaxed">
               {isSeeker 
-                ? "Create your first job listing to start receiving bids." 
-                : "Try expanding your Service Zones radius or check back later."}
+                ? "Post a job to find workers easily." 
+                : "Add more work areas to see more jobs."}
             </p>
             
             {isSeeker ? (
                <Link href="/jobs/new" className="mt-8 inline-flex btn-primary gap-2 rounded-full">
-                 Create Job <ArrowRight size={18} />
+                 Post a Job <ArrowRight size={18} />
                </Link>
             ) : (
                <Link href="/profile/locations" className="mt-8 inline-flex btn-secondary gap-2 rounded-full">
-                 Adjust Zones <ArrowRight size={16} />
+                 Edit Work Area <ArrowRight size={16} />
                </Link>
             )}
           </div>

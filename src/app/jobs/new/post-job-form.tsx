@@ -2,11 +2,10 @@
 
 import { useActionState, useState } from "react";
 import { createJob } from "./actions";
-import { Loader2, ArrowLeft, MapPin, Laptop, Users, Calculator, Info, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Globe, Users, Calculator, Info, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-// Lazy load the map
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { 
   ssr: false,
   loading: () => (
@@ -23,12 +22,10 @@ const initialState = {
 export default function PostJobForm() {
   const [state, action, isPending] = useActionState(createJob, initialState);
   
-  // Location State
   const [isRemote, setIsRemote] = useState(false);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [radius, setRadius] = useState(1000); 
 
-  // Budget & Quantity State
   const [budget, setBudget] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("1");
 
@@ -40,10 +37,8 @@ export default function PostJobForm() {
 
   return (
     <div className="min-h-dvh bg-gray-50/50 pb-24 dark:bg-black pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
-      {/* Fixed: Widened container to max-w-screen-2xl to remove side gaps */}
       <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24">
         
-        {/* Header */}
         <div className="mb-6 flex items-center gap-4">
           <Link
             href="/"
@@ -57,7 +52,6 @@ export default function PostJobForm() {
           </div>
         </div>
 
-        {/* Main Form Card */}
         <div className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-gray-100 dark:bg-zinc-900 dark:ring-zinc-800 md:p-8">
           <form action={action} className="space-y-8">
             
@@ -68,10 +62,9 @@ export default function PostJobForm() {
               </div>
             )}
 
-            {/* --- 1. Job Type Toggle --- */}
             <div>
                 <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Location Type
+                    Where is the work?
                 </label>
                 <div className="grid grid-cols-2 gap-1 rounded-2xl bg-gray-100 p-1.5 dark:bg-zinc-800">
                     <button
@@ -84,7 +77,7 @@ export default function PostJobForm() {
                         }`}
                     >
                         <MapPin size={18} />
-                        In Person
+                        Local Area
                     </button>
                     <button
                         type="button"
@@ -95,14 +88,13 @@ export default function PostJobForm() {
                             : "text-gray-500 hover:text-gray-900 dark:text-gray-400"
                         }`}
                     >
-                        <Laptop size={18} />
-                        Remote
+                        <Globe size={18} />
+                        Anywhere
                     </button>
                 </div>
                 <input type="hidden" name="is_remote" value={isRemote.toString()} />
             </div>
 
-            {/* --- 2. Location Picker (Conditional) --- */}
             {!isRemote && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
                     <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-zinc-700">
@@ -122,10 +114,9 @@ export default function PostJobForm() {
                     <input type="hidden" name="lat" value={location?.lat || ""} />
                     <input type="hidden" name="lng" value={location?.lng || ""} />
 
-                    {/* Radius Slider */}
                     <div className="rounded-2xl bg-gray-50 p-4 dark:bg-zinc-800/50">
                         <div className="flex justify-between text-sm mb-3">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">Visibility Radius</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">Search Distance</span>
                             <span className="font-bold text-brand-blue">{(radius / 1000).toFixed(1)} km</span>
                         </div>
                         <input 
@@ -139,13 +130,12 @@ export default function PostJobForm() {
                             className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-brand-blue dark:bg-zinc-700"
                         />
                         <p className="mt-2 text-xs text-gray-500">
-                            Providers within this circle will see your job.
+                            Only workers in this area will see your job.
                         </p>
                     </div>
                 </div>
             )}
 
-            {/* --- 3. Job Details --- */}
             <div className="space-y-5">
                 <div>
                     <label htmlFor="title" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
@@ -164,7 +154,7 @@ export default function PostJobForm() {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <div>
                         <label htmlFor="category" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
-                            Category
+                            Category (Type of Work)
                         </label>
                         <div className="relative">
                             <select
@@ -175,11 +165,11 @@ export default function PostJobForm() {
                                 className="block w-full appearance-none rounded-2xl border-0 bg-gray-50 px-4 py-4 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-brand-blue sm:text-sm sm:leading-6 dark:bg-zinc-800/50 dark:text-white dark:ring-zinc-700"
                             >
                                 <option value="" disabled>Select Category</option>
-                                <option value="assignment">Assignment Help</option>
-                                <option value="tutoring">Tutoring</option>
-                                <option value="delivery">Delivery</option>
-                                <option value="tech">Tech Support</option>
-                                <option value="household">Household</option>
+                                <option value="assignment">Homework / Assignment</option>
+                                <option value="tutoring">Tuition / Teaching</option>
+                                <option value="delivery">Delivery / Pickup</option>
+                                <option value="tech">Mobile / Computer Help</option>
+                                <option value="household">House Work / Cleaning</option>
                                 <option value="other">Other</option>
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
@@ -190,7 +180,7 @@ export default function PostJobForm() {
 
                     <div>
                         <label htmlFor="deadline" className="mb-2 block text-sm font-bold text-gray-900 dark:text-white">
-                            Deadline
+                            Finish By (Date & Time)
                         </label>
                         <input
                             type="datetime-local"
@@ -218,7 +208,6 @@ export default function PostJobForm() {
                 </div>
             </div>
 
-            {/* --- 4. Budget & Hiring --- */}
             <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <div className="bg-gray-50 px-5 py-3 border-b border-gray-100 dark:bg-zinc-800/50 dark:border-zinc-800">
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -230,7 +219,7 @@ export default function PostJobForm() {
                 <div className="p-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label htmlFor="budget" className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
-                            Budget Per Person
+                            Payment Per Person
                         </label>
                         <div className="relative">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
@@ -252,7 +241,7 @@ export default function PostJobForm() {
 
                     <div>
                         <label htmlFor="quantity" className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
-                            Num. of People
+                            How many workers?
                         </label>
                         <div className="relative">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
@@ -275,13 +264,12 @@ export default function PostJobForm() {
 
                 {totalCost > 0 && (
                     <div className="bg-blue-50/50 px-5 py-4 flex justify-between items-center dark:bg-blue-900/10">
-                        <span className="text-sm font-medium text-blue-900 dark:text-blue-200">Total Estimated Cost</span>
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-200">Total Payment</span>
                         <span className="text-xl font-bold text-brand-blue">₹{totalCost.toLocaleString()}</span>
                     </div>
                 )}
             </div>
 
-            {/* Submit */}
             <button
                 type="submit"
                 disabled={isPending}
