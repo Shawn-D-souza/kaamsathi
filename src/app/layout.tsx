@@ -54,7 +54,7 @@ export default async function RootLayout({
         >
           <BackButtonHandler />
           <OfflineBanner />
-          <Navbar />
+          <Navbar user={user} />
 
           <div className="min-h-screen w-full bg-[var(--background)] transition-colors duration-200 pt-0">
             <main className={`min-h-screen ${user ? 'pb-24 md:pb-12' : ''}`}>

@@ -2,34 +2,68 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Briefcase, MessageSquare, User, Plus, LogIn } from "lucide-react";
+import { Home, Briefcase, MessageSquare, User as UserIcon, LogIn } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+import type { User } from "@supabase/supabase-js";
 
-export default function Navbar() {
+interface NavbarProps {
+  user: User | null;
+}
+
+export default function Navbar({ user: initialUser }: NavbarProps) {
   const pathname = usePathname();
   const [isSeeker, setIsSeeker] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(initialUser);
   const supabase = createClient();
+
+  const isLanding = !user;
+
+  // Dynamic Styles
+  const headerClass = isLanding
+    ? "bg-brand-blue border-white/10 shadow-blue-900/5 dark:bg-[#0f172a] dark:border-slate-800"
+    : "bg-white/95 backdrop-blur-md border-slate-200 shadow-sm dark:bg-[#0f172a]/95 dark:border-slate-800";
+
+  const textClass = isLanding
+    ? "text-white"
+    : "text-slate-900 dark:text-white";
+
+  const mutedTextClass = isLanding
+    ? "text-white/70 hover:text-white"
+    : "text-slate-500 hover:text-brand-blue dark:text-slate-400 dark:hover:text-white";
+
+  const activeIconClass = isLanding
+    ? "fill-white/20"
+    : "fill-brand-blue/20 text-brand-blue";
+
+  const logoBorderClass = isLanding
+    ? "border-white/20"
+    : "border-slate-200 dark:border-slate-700";
+
+  const profileButtonClass = isLanding
+    ? "bg-white/10 text-white hover:bg-white/20 border-white/10"
+    : "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700";
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      setUser(currentUser);
       
-      if (user) {
+      if (currentUser) {
         const { data } = await supabase
           .from("profiles")
           .select("role")
-          .eq("id", user.id)
+          .eq("id", currentUser.id)
           .single();
         setIsSeeker(data?.role === "seeker");
       }
     };
-    fetchUser();
 
-    // Listen for role updates
+    if (!user || (user && !isSeeker)) {
+       fetchUser();
+    }
+
     const handleRoleUpdate = (event: CustomEvent) => {
       setIsSeeker(event.detail === "seeker");
     };
@@ -37,7 +71,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("role-updated", handleRoleUpdate as EventListener);
     };
-  }, [supabase]);
+  }, [supabase, user, isSeeker]);
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -46,15 +80,12 @@ export default function Navbar() {
   ];
 
   return (
-    // SOLID BLUE HEADER (Restored Old Design)
-    <header className="fixed top-0 left-0 z-50 hidden w-full border-b border-white/10 bg-brand-blue shadow-lg shadow-blue-900/5 dark:bg-[#0f172a] dark:border-slate-800 md:block">
+    <header className={`fixed top-0 left-0 z-50 hidden w-full border-b shadow-lg md:block transition-colors duration-200 ${headerClass}`}>
       <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-6">
         
-        {/* Left Side: Logo + Nav Links */}
         <div className="flex items-center gap-10">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-white">
-             {/* Logo Image */}
-             <div className="relative h-8 w-8 overflow-hidden rounded-lg shadow-md border border-white/20">
+          <Link href="/" className={`flex items-center gap-2 text-2xl font-extrabold tracking-tight ${textClass}`}>
+             <div className={`relative h-8 w-8 overflow-hidden rounded-lg shadow-md border ${logoBorderClass}`}>
               <Image 
                 src="/logo.png" 
                 alt="KaamSaathi" 
@@ -66,7 +97,6 @@ export default function Navbar() {
             KaamSaathi
           </Link>
           
-          {/* ONLY SHOW LINKS IF LOGGED IN */}
           {user && (
             <nav className="flex items-center gap-8">
               {navItems.map((item) => {
@@ -77,11 +107,11 @@ export default function Navbar() {
                     href={item.href}
                     className={`flex items-center gap-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? "text-white opacity-100"
-                        : "text-white/70 hover:text-white"
+                        ? `${textClass} opacity-100`
+                        : mutedTextClass
                     }`}
                   >
-                    <item.icon size={18} className={isActive ? "fill-white/20" : ""} />
+                    <item.icon size={18} className={isActive ? activeIconClass : ""} />
                     {item.name}
                   </Link>
                 );
@@ -90,27 +120,14 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Right Side: Action Buttons */}
         <div className="flex items-center gap-4">
           {user ? (
-            <>
-              {isSeeker && (
-                <Link
-                  href="/jobs/new"
-                  className="flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-blue shadow-sm transition-transform hover:bg-blue-50 active:scale-95"
-                >
-                  <Plus size={18} />
-                  <span>Post Job</span>
-                </Link>
-              )}
-
-              <Link 
-                href="/profile"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10"
-              >
-                <User size={20} />
-              </Link>
-            </>
+            <Link 
+              href="/profile"
+              className={`flex h-9 w-9 items-center justify-center rounded-full transition-all border ${profileButtonClass}`}
+            >
+              <UserIcon size={20} />
+            </Link>
           ) : (
             <Link
               href="/auth"
