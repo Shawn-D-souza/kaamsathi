@@ -44,10 +44,9 @@ export default async function MyJobsPage() {
         </header>
 
         {isEmpty ? (
-          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
+          <div className="mt-8 flex min-h-[400px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--card-border)] p-12 text-center">
             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm"><Briefcase className="h-8 w-8 text-gray-400" /></div>
             <h3 className="text-lg font-semibold text-[var(--foreground)]">No activity yet</h3>
-            <div className="mt-6 flex gap-3"><Link href="/jobs/new" className="btn-primary">Post Job</Link><Link href="/" className="btn-secondary">Find Work</Link></div>
           </div>
         ) : (
           <div className="space-y-10">

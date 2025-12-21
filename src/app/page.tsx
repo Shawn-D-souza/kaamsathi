@@ -72,7 +72,7 @@ export default async function Home() {
                     <ArrowRight size={20} className="ml-2" />
                   </Link>
                   
-                  <Link href="/auth" className="btn-secondary w-full sm:w-auto text-lg py-4 px-8 rounded-full">
+                  <Link href="/auth" className="btn-primary w-full sm:w-auto text-lg py-4 px-8 rounded-full">
                     Find Work
                   </Link>
                 </div>
@@ -207,23 +207,27 @@ export default async function Home() {
     <div className="min-h-dvh pt-[calc(0.2rem+env(safe-area-inset-top))] md:pt-0">
       
       <div className="mx-auto max-w-screen-2xl px-6 py-4 md:pt-24 pb-8">
-        <div className="flex justify-between items-end mb-6">
-           <div>
-             <h1 className="text-3xl font-extrabold tracking-tight">
-               {isSeeker ? "Jobs I Posted" : "Jobs For You"}
-             </h1>
-           </div>
-           
-           {isSeeker && (
-             <Link href="/jobs/new" className="hidden sm:inline-flex btn-primary gap-2 rounded-full">
-                <Zap size={18} /> Hire Someone
-             </Link>
-           )}
-        </div>
+  <div className="flex justify-between items-center mb-6">
+     <div>
+       <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+         {isSeeker ? "Jobs I Posted" : "Jobs For You"}
+       </h1>
+     </div>
+     
+     {isSeeker && (
+       <Link 
+         href="/jobs/new" 
+         className="inline-flex btn-primary rounded-full gap-1.5 py-2 px-4 text-xs sm:gap-2 sm:py-3 sm:px-4 sm:text-sm"
+       >
+          <Zap className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /> 
+          Hire Someone
+       </Link>
+     )}
+  </div>
 
         {jobs.length === 0 ? (
-          <div className="mt-8 text-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 p-16 card-surface">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800">
+          <div className="mt-8 flex min-h-[400px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 p-12 text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800">
               {isSeeker ? <LayoutGrid className="text-muted" size={32} /> : <MapPin className="text-muted" size={32} />}
             </div>
             <h3 className="text-xl font-bold">
@@ -240,13 +244,13 @@ export default async function Home() {
                  Post a Job <ArrowRight size={18} />
                </Link>
             ) : (
-               <Link href="/profile/locations" className="mt-8 inline-flex btn-secondary gap-2 rounded-full">
+               <Link href="/profile/locations" className="mt-8 inline-flex btn-primary gap-2 rounded-full">
                  Edit Work Area <ArrowRight size={16} />
                </Link>
             )}
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} isOwner={isSeeker} />
             ))}
