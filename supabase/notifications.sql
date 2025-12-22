@@ -85,3 +85,55 @@ create trigger on_new_message
 
 -- 6. Enable Realtime
 alter publication supabase_realtime add table public.notifications;
+
+-- 7. AUTOMATION: Trigger for Bids (New Bid & Bid Accepted)
+create or replace function public.handle_bid_changes()
+returns trigger as $$
+declare
+  v_job_owner_id uuid;
+  v_job_title text;
+begin
+  -- Get Job Details (Owner & Title)
+  select owner_id, title into v_job_owner_id, v_job_title
+  from public.jobs
+  where id = new.job_id;
+
+  -- SCENARIO A: New Bid Created -> Notify Job Owner
+  if (tg_op = 'INSERT') then
+    insert into public.notifications (
+      user_id, actor_id, type, title, body, resource_id, resource_url
+    ) values (
+      v_job_owner_id,           -- To: Job Owner
+      new.bidder_id,            -- From: Bidder
+      'bid',                    -- Type
+      'New Bid Received',
+      'You have received a new bid for ' || v_job_title,
+      new.job_id,
+      '/jobs/' || new.job_id    -- Link to the Job
+    );
+  end if;
+
+  -- SCENARIO B: Bid Accepted -> Notify Provider
+  if (tg_op = 'UPDATE' and old.status != 'accepted' and new.status = 'accepted') then
+    insert into public.notifications (
+      user_id, actor_id, type, title, body, resource_id, resource_url
+    ) values (
+      new.bidder_id,            -- To: The Provider
+      v_job_owner_id,           -- From: Job Owner
+      'job_update',             -- Type
+      'Bid Accepted!',
+      'Congratulations! Your bid for ' || v_job_title || ' has been accepted.',
+      new.job_id,
+      '/jobs/' || new.job_id    -- Link to the Job
+    );
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- 8. Attach Trigger to Bids Table
+drop trigger if exists on_bid_changes on public.bids;
+create trigger on_bid_changes
+  after insert or update on public.bids
+  for each row execute procedure public.handle_bid_changes();
