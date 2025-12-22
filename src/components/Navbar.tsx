@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import type { User } from "@supabase/supabase-js";
+import NotificationBell from "./NotificationBell"; // IMPORT ADDED
 
 interface NavbarProps {
   user: User | null;
@@ -121,6 +122,9 @@ export default function Navbar({ user: initialUser }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-4">
+          
+          {user && <NotificationBell userId={user.id} />}
+
           {user ? (
             <Link 
               href="/profile"

@@ -82,3 +82,6 @@ drop trigger if exists on_new_message on public.messages;
 create trigger on_new_message
   after insert on public.messages
   for each row execute procedure public.handle_new_message();
+
+-- 6. Enable Realtime
+alter publication supabase_realtime add table public.notifications;
